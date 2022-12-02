@@ -2,11 +2,15 @@
 name = "avr-boot"
 version = "0.1.0"
 edition = "2021"
+authors = ["Peter Smith <peter@orukusaki.co.uk>"]
+license = "MIT"
+description = "Self Programming functions for AVR MCUs"
+readme = "../README.md"
+repository = "https://github.com/orukusaki/avr-boot"
+keywords = ["avr", "booloader", "arduino", "atmega", "attiny", "microcontroller", "simavr"]
 
 [dependencies]
 const_env--value = "0.1"
-attiny-hal = {git = "https://github.com/rahix/avr-hal", optional=true}
-atmega-hal = {git = "https://github.com/rahix/avr-hal", optional=true}
 
 [build-dependencies]
 avr-mcu = "0.3.5"
@@ -15,7 +19,9 @@ avr-mcu = "0.3.5"
 panic-halt = "0.2.0"
 avr-progmem = "0.3.1"
 ufmt = "0.2.0"
-avr-device = {version = "*", features=["rt"]}
+avr-device = {version = "0.4.0", features=["rt"]}
+attiny-hal = {git = "https://github.com/rahix/avr-hal", version="0.1.0", features = ['disable-device-selection-error']}
+atmega-hal = {git = "https://github.com/rahix/avr-hal", version="0.1.0", features = ['disable-device-selection-error']}
 
 [features]
 hal-atmega = []
@@ -28,11 +34,11 @@ atmega32u4 = ['atmega-hal/atmega32u4', 'hal-atmega']
 atmega1280 = ['atmega-hal/atmega1280', 'hal-atmega']
 atmega2560 = ['atmega-hal/atmega2560', 'hal-atmega']
 atmega1284p = ['atmega-hal/atmega1284p', 'hal-atmega']
-attiny84 =  ['attiny-hal/attiny84', 'hal-attiny']
-attiny85 =  ['attiny-hal/attiny85', 'hal-attiny']
-attiny88 =  ['attiny-hal/attiny88', 'hal-attiny']
+attiny84 = ['attiny-hal/attiny84', 'hal-attiny']
+attiny85 = ['attiny-hal/attiny85', 'hal-attiny']
+attiny88 = ['attiny-hal/attiny88', 'hal-attiny']
 attiny167 = ['attiny-hal/attiny167', 'hal-attiny']
-attiny2313 =  ['attiny-hal/attiny2313', 'hal-attiny']
+attiny2313 = ['attiny-hal/attiny2313', 'hal-attiny']
 
 [profile.release]
 lto = true
