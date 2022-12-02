@@ -1,0 +1,6 @@
+[unstable]
+build-std = ["core"]
+build-std-features = ["compiler-builtins-mangled-names"]
+
+[build]
+target=".cargo/targets/atmega328.json"

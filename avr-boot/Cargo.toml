@@ -1,0 +1,26 @@
+[package]
+name = "avr-boot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+const_env--value = "0.1"
+
+[build-dependencies]
+avr-mcu = "0.3.5"
+
+[dev-dependencies]
+panic-halt = "0.2.0"
+avr-progmem = "0.3.1"
+arduino-hal = {git = "https://github.com/rahix/avr-hal", features = ["arduino-uno"]}
+ufmt = "0.2.0"
+
+[profile.release]
+lto = true
+opt-level = "s" 
+codegen-units = 1
+panic = "abort"
+
+[profile.release.package."*"]
+inherits = "release"
+opt-level = "s" 
