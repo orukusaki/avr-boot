@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: install dependencies
-      run: sudo apt install -y gcc-avr avr-libc libelf
+      run: sudo apt install -y gcc-avr avr-libc libelf-dev
     - uses: actions/checkout@v3
   build:
     needs: setup
