@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest  
     defaults:
       run:
-        working-directory: ./avr-boot
+        working-directory: ../avr-boot
     steps:
     - name: Build
       run: cargo build --verbose --release
@@ -30,7 +30,7 @@ jobs:
     needs: setup
     defaults:
       run:
-        working-directory: ./avr-boot-tests
+        working-directory: ../avr-boot-tests
     steps:
     - name: Run tests
       run: cargo test --verbose
