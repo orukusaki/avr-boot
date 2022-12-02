@@ -210,6 +210,7 @@ impl<const N: Address> ExactSizeIterator for PageBuffer<N> {
     }
 }
 
+/// A single 16 bit word in the page buffer. Write only.
 impl BufferCell {
     /// Set the value of the cell
     pub fn set(&self, w: u16) {
