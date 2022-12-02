@@ -10,15 +10,11 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-    - name: install dependencies
-      run: sudo apt install -y gcc-avr avr-libc libelf-dev pkg-config
   build:
-    needs: setup
     runs-on: ubuntu-latest  
     steps:
+    - name: Install dependencies
+      run: sudo apt install -y gcc-avr avr-libc libelf-dev pkg-config
     - uses: actions/checkout@v3
     - name: Build
       working-directory: avr-boot
