@@ -10,19 +10,23 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-
   setup:
     runs-on: ubuntu-latest
     steps:
     - name: install dependencies
-      run: sudo apt install -y gcc-avr avr-libc
+      run: sudo apt install -y gcc-avr avr-libc libelf
+    - uses: actions/checkout@v3
   build:
+    needs: setup
     runs-on: ubuntu-latest  
     steps:
-    - uses: actions/checkout@v3
     - name: Build
       working-directory: avr-boot
       run: cargo build --verbose --release
+  test:
+    runs-on: ubuntu-latest  
+    needs: setup
+    steps:
     - name: Run tests
       working-directory: avr-boot-tests
       run: cargo test --verbose
