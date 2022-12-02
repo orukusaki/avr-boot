@@ -15,22 +15,14 @@ jobs:
     steps:
     - name: install dependencies
       run: sudo apt install -y gcc-avr avr-libc libelf-dev
-    - uses: actions/checkout@v3
   build:
     needs: setup
     runs-on: ubuntu-latest  
-    defaults:
-      run:
-        working-directory: ../avr-boot
     steps:
+    - uses: actions/checkout@v3
     - name: Build
+      working-directory: avr-boot
       run: cargo build --verbose --release
-  test:
-    runs-on: ubuntu-latest  
-    needs: setup
-    defaults:
-      run:
-        working-directory: ../avr-boot-tests
-    steps:
     - name: Run tests
+      working-directory: avr-boot-tests
       run: cargo test --verbose
