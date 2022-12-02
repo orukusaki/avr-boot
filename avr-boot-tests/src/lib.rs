@@ -3,7 +3,7 @@
 use avr_tester::{AvrTester, AvrTesterBuilder};
 use std::{path::Path, process::Command};
 
-pub fn avr(test: &str, target: &str) -> AvrTester {
+pub fn avr(test: &str, target: &str, hal: &str) -> AvrTester {
     eprintln!("Building firmware");
 
     let module_dir = Path::new("..").join("avr-boot");
@@ -13,6 +13,7 @@ pub fn avr(test: &str, target: &str) -> AvrTester {
         .arg("--release")
         .arg(format!("--target=.cargo/targets/{}.json", target))
         .arg(format!("--example={}", test))
+        .arg(format!("--features={}", hal))
         .current_dir(&module_dir)
         .status()
         .expect("Couldn't build firmware")
@@ -35,9 +36,6 @@ pub fn avr(test: &str, target: &str) -> AvrTester {
 
 #[cfg(test)]
 mod atmega;
-
-#[cfg(test)]
-mod extended;
 
 #[cfg(test)]
 mod tiny;

@@ -7,7 +7,7 @@ use avr_boot::PageBuffer;
 use panic_halt as _;
 use runner::run_test;
 
-#[arduino_hal::entry]
+#[avr_device::entry]
 fn main() -> ! {
     run_test(|address| {
         let mut data_iterator = [0x69].into_iter().cycle();

@@ -7,7 +7,7 @@ use avr_boot::{DataPage, PageBuffer};
 use panic_halt as _;
 use runner::run_test;
 
-#[arduino_hal::entry]
+#[avr_device::entry]
 fn main() -> ! {
     run_test(|address| {
         let data: DataPage = core::array::from_fn(|_| 0x69);

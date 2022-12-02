@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 const_env--value = "0.1"
+attiny-hal = {git = "https://github.com/rahix/avr-hal", optional=true}
+atmega-hal = {git = "https://github.com/rahix/avr-hal", optional=true}
 
 [build-dependencies]
 avr-mcu = "0.3.5"
@@ -12,8 +14,25 @@ avr-mcu = "0.3.5"
 [dev-dependencies]
 panic-halt = "0.2.0"
 avr-progmem = "0.3.1"
-arduino-hal = {git = "https://github.com/rahix/avr-hal", features = ["arduino-uno"]}
 ufmt = "0.2.0"
+avr-device = {version = "*", features=["rt"]}
+
+[features]
+hal-atmega = []
+hal-attiny = []
+atmega48p = ['atmega-hal/atmega48p', 'hal-atmega']
+atmega168 = ['atmega-hal/atmega168', 'hal-atmega']
+atmega328p = ['atmega-hal/atmega328p', 'hal-atmega']
+atmega328pb = ['atmega-hal/atmega328pb', 'hal-atmega']
+atmega32u4 = ['atmega-hal/atmega32u4', 'hal-atmega']
+atmega1280 = ['atmega-hal/atmega1280', 'hal-atmega']
+atmega2560 = ['atmega-hal/atmega2560', 'hal-atmega']
+atmega1284p = ['atmega-hal/atmega1284p', 'hal-atmega']
+attiny84 =  ['attiny-hal/attiny84', 'hal-attiny']
+attiny85 =  ['attiny-hal/attiny85', 'hal-attiny']
+attiny88 =  ['attiny-hal/attiny88', 'hal-attiny']
+attiny167 = ['attiny-hal/attiny167', 'hal-attiny']
+attiny2313 =  ['attiny-hal/attiny2313', 'hal-attiny']
 
 [profile.release]
 lto = true

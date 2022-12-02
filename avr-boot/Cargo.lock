@@ -3,21 +3,16 @@
 version = 3
 
 [[package]]
-name = "arduino-hal"
+name = "atmega-hal"
 version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal#4170a773d4d76cc93433d2455ed8b14e573ebe70"
 dependencies = [
- "atmega-hal",
  "avr-device",
  "avr-hal-generic",
- "cfg-if 1.0.0",
- "embedded-hal",
- "ufmt 0.1.2",
- "void",
 ]
 
 [[package]]
-name = "atmega-hal"
+name = "attiny-hal"
 version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal#4170a773d4d76cc93433d2455ed8b14e573ebe70"
 dependencies = [
@@ -29,7 +24,9 @@ dependencies = [
 name = "avr-boot"
 version = "0.1.0"
 dependencies = [
- "arduino-hal",
+ "atmega-hal",
+ "attiny-hal",
+ "avr-device",
  "avr-mcu",
  "avr-progmem",
  "const_env--value",

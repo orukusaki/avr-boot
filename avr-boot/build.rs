@@ -1,6 +1,16 @@
+struct McuInfo {
+    spmcsr: u8,
+    page_erase: u8,
+    page_write: u8,
+    page_fill: u8,
+    rww_enable: Option<u8>,
+    boot_lock_bits_set: u8,
+    rampz: Option<u8>,
+    page_size: usize,
+}
+
 fn main() {
     println!("cargo:rustc-link-arg=-lc");
-    // println!("cargo:rustc-link-arg=-Wl,--section-start=.text=0x7C00,-lc");
 
     let info = get_mcu_info();
 
@@ -23,17 +33,6 @@ fn main() {
         println!("cargo:rustc-cfg=extended_addressing");
         println!("cargo:rustc-env=AVR_RAMPZ={}", rampz);
     }
-}
-
-struct McuInfo {
-    spmcsr: u8,
-    page_erase: u8,
-    page_write: u8,
-    page_fill: u8,
-    rww_enable: Option<u8>,
-    boot_lock_bits_set: u8,
-    rampz: Option<u8>,
-    page_size: usize,
 }
 
 fn get_mcu_info() -> McuInfo {

@@ -10,7 +10,7 @@ use avr_boot::{spm, DataPage, SPM_PAGESIZE_WORDS};
 use panic_halt as _;
 use runner::extended::run_test;
 
-#[arduino_hal::entry]
+#[avr_device::entry]
 fn main() -> ! {
     run_test(|address| {
         let data: DataPage = [0x69; SPM_PAGESIZE_WORDS];

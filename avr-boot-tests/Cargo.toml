@@ -4,4 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-avr-tester = {path = "../../avr-tester/avr-tester"}
+avr-tester = "0.1.0"
+test-case = "2.2.2"
