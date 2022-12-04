@@ -1,2 +1,3 @@
 avr-boot/target
 avr-boot-tests/target
+avr-boot-examples/target

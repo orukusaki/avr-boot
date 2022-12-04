@@ -9,7 +9,7 @@ use crate::spm::Address;
 /// # Example
 /// ```no_run
 /// // clear a page
-/// let mut buff = spm::PageBuffer::new(address);
+/// let mut buff = PageBuffer::new(address);
 /// for w in &mut buff {
 ///     w.set(0xabcd);
 /// }
@@ -59,7 +59,7 @@ impl<const N: Address> PageBuffer<N> {
     ///
     /// ```no_run
     /// let data = [0xffff; crate::SPM_PAGESIZE_WORDS];
-    /// let mut buff = spm::PageBuffer::new(address);
+    /// let mut buff = PageBuffer::new(address);
     /// buff.store_from_slice(&data);
     /// ```
     pub fn store_from_slice(self, data: &[u16; crate::SPM_PAGESIZE_WORDS]) {
@@ -74,44 +74,12 @@ impl<const N: Address> PageBuffer<N> {
     ///
     /// ```no_run
     /// let data = [0xff; crate::SPM_PAGESIZE_BYTES];
-    /// let mut buff = spm::PageBuffer::new(address);
+    /// let mut buff = PageBuffer::new(address);
     /// buff.store_from_bytes(&data);
     /// ```
     pub fn store_from_bytes(self, data: &[u8; crate::SPM_PAGESIZE_BYTES]) {
         let aswords: &[u16; crate::SPM_PAGESIZE_WORDS] = unsafe { core::mem::transmute(data) };
         self.store_from_slice(aswords);
-    }
-
-    /// Fill the buffer from an existing slice
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// let data = [0xffff; SPM_PAGESIZE_WORDS];
-    /// let mut buff = spm::PageBuffer::new(address);
-    /// buff.fill_from_slice(&data);
-    /// buff.store();
-    /// ```
-    pub fn fill_from_slice(&mut self, data: &[u16; crate::SPM_PAGESIZE_WORDS]) {
-        let mut i = data.iter();
-        for word in self {
-            word.set(*i.next().unwrap());
-        }
-    }
-
-    /// Fill the buffer from an existing byte slice
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// let data = [0xff; SPM_PAGESIZE_BYTES];
-    /// let mut buff = PageBuffer::new(address);
-    /// buff.fill_from_bytes(&data);
-    /// buff.store();
-    /// ```
-    pub fn fill_from_bytes(&mut self, data: &[u8; crate::SPM_PAGESIZE_BYTES]) {
-        let words: &[u16; crate::SPM_PAGESIZE_WORDS] = unsafe { core::mem::transmute(data) };
-        self.fill_from_slice(words);
     }
 
     /// Fill the buffer by repeatedly calling the callback function
@@ -139,15 +107,15 @@ impl<const N: Address> PageBuffer<N> {
     ///
     /// ```
     /// let data = [0x69];
-    /// let mut i = data.into_iter().cycle();
+    /// let i = data.iter().cycle();
     ///
     /// let mut buff = PageBuffer::new(address);
     /// buff.fill_from_iter(&mut i);
     /// buff.store();
     /// ```
-    pub fn fill_from_iter<I: Iterator<Item = u16>>(&mut self, i: &mut I) {
-        for word in self {
-            word.set(i.next().unwrap());
+    pub fn fill_from_iter(&mut self, i: impl IntoIterator<Item = u16>) {
+        for (word, value) in self.into_iter().zip(i.into_iter()) {
+            word.set(value);
         }
     }
 
@@ -159,7 +127,7 @@ impl<const N: Address> PageBuffer<N> {
 
         spm::write_page(page_address);
         spm::busy_wait();
-        spm::rww_enable();
+
         // No need to run destructor
         core::mem::forget(self);
     }
@@ -169,6 +137,7 @@ impl<const N: Address> Drop for PageBuffer<N> {
     fn drop(&mut self) {
         // TODO: on some MCUs there is a buffer clear SPM command, run it here
         // clear_buffer(self.address);
+        spm::rww_enable();
     }
 }
 
@@ -177,7 +146,7 @@ impl<const N: Address> Drop for PageBuffer<N> {
 /// # Example
 ///
 /// ```no_run
-/// let mut buff = spm::PageBuffer::new(address);
+/// let mut buff = PageBuffer::new(address);
 /// for w in &mut buff {
 ///     w.set(0x69);
 /// }

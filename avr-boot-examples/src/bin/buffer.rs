@@ -1,11 +1,9 @@
 #![no_std]
 #![no_main]
 
-mod runner;
-
 use avr_boot::PageBuffer;
 use panic_halt as _;
-use runner::run_test;
+use avr_boot_examples::run_test;
 
 #[avr_device::entry]
 fn main() -> ! {

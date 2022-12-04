@@ -1,0 +1,47 @@
+[package]
+name = "avr-boot-examples"
+version = "0.1.0"
+edition = "2021"
+authors = ["Peter Smith <peter@orukusaki.co.uk>"]
+license = "MIT"
+description = "Example firmware code to test avr-boot functions"
+readme = "README.md"
+repository = "https://github.com/orukusaki/avr-boot"
+keywords = ["avr", "booloader", "arduino", "atmega", "attiny", "microcontroller", "simavr", "example"]
+
+[dependencies]
+avr-boot = {path = "../avr-boot"}
+panic-halt = "0.2.0"
+avr-progmem = "0.3.1"
+ufmt = "0.2.0"
+avr-device = {version = "0.4.0", features=["rt"]}
+attiny-hal = {git = "https://github.com/rahix/avr-hal", optional = true}
+atmega-hal = {git = "https://github.com/rahix/avr-hal", optional = true}
+
+[features]
+hal-atmega = []
+hal-attiny = []
+extended_addressing = []
+atmega48p = ['atmega-hal/atmega48p', 'hal-atmega']
+atmega168 = ['atmega-hal/atmega168', 'hal-atmega']
+atmega328p = ['atmega-hal/atmega328p', 'hal-atmega']
+atmega328pb = ['atmega-hal/atmega328pb', 'hal-atmega']
+atmega32u4 = ['atmega-hal/atmega32u4', 'hal-atmega']
+atmega1280 = ['atmega-hal/atmega1280', 'hal-atmega', 'extended_addressing']
+atmega2560 = ['atmega-hal/atmega2560', 'hal-atmega', 'extended_addressing']
+atmega1284p = ['atmega-hal/atmega1284p', 'hal-atmega', 'extended_addressing']
+attiny84 = ['attiny-hal/attiny84', 'hal-attiny']
+attiny85 = ['attiny-hal/attiny85', 'hal-attiny']
+attiny88 = ['attiny-hal/attiny88', 'hal-attiny']
+attiny167 = ['attiny-hal/attiny167', 'hal-attiny']
+attiny2313 = ['attiny-hal/attiny2313', 'hal-attiny']
+
+[profile.release]
+lto = true
+opt-level = "s" 
+codegen-units = 1
+panic = "abort"
+
+[profile.release.package."*"]
+inherits = "release"
+opt-level = "s" 

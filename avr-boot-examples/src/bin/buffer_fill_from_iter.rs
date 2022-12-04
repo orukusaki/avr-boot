@@ -1,18 +1,16 @@
 #![no_std]
 #![no_main]
 
-mod runner;
-
-use avr_boot::{DataPage, PageBuffer};
+use avr_boot::PageBuffer;
 use panic_halt as _;
-use runner::run_test;
+use avr_boot_examples::run_test;
 
 #[avr_device::entry]
 fn main() -> ! {
     run_test(|address| {
-        let data: DataPage = core::array::from_fn(|_| 0x69);
+        let data = [0x69];
         let mut buff = PageBuffer::new(address);
-        buff.fill_from_slice(&data);
+        buff.fill_from_iter(data.into_iter().cycle());
         buff.store();
     });
 

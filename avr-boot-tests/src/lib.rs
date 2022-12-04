@@ -6,13 +6,13 @@ use std::{path::Path, process::Command};
 pub fn avr(test: &str, target: &str, hal: &str) -> AvrTester {
     eprintln!("Building firmware");
 
-    let module_dir = Path::new("..").join("avr-boot");
+    let module_dir = Path::new("..").join("avr-boot-examples");
 
     Command::new("cargo")
         .arg("build")
         .arg("--release")
-        .arg(format!("--target=.cargo/targets/{}.json", target))
-        .arg(format!("--example={}", test))
+        .arg(format!("--target=../.cargo/targets/{}.json", target))
+        .arg(format!("--bin={}", test))
         .arg(format!("--features={}", hal))
         .current_dir(&module_dir)
         .status()
@@ -24,7 +24,6 @@ pub fn avr(test: &str, target: &str, hal: &str) -> AvrTester {
         .join("target")
         .join(target)
         .join("release")
-        .join("examples")
         .join(format!("{}.elf", test));
 
     eprintln!("Starting test");
