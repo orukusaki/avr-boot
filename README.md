@@ -51,7 +51,7 @@ spm::busy_wait();
 spm::rww_enable();
 ```
 
-Check out the [http://github.com/orukusaki/avr-boot/avr-boot-examples](examples module) for more usage examples 
+Check out the [examples module](https://github.com/orukusaki/avr-boot/tree/main/avr-boot-examples/src/bin)  for more usage examples 
 
 ## Supported MCUs:
 ### Physically tested with:
