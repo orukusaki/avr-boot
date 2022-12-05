@@ -1,9 +1,7 @@
 //! High level page buffer API
-//! use the re-exported [crate::PageBuffer] to ensure your buffer is
-//! the correct size for your target MCU
 
-use crate::{spm, DataPage};
 use crate::spm::Address;
+use crate::{spm, DataPage};
 
 /// Representation of the spm page buffer.
 ///
@@ -30,7 +28,7 @@ use crate::spm::Address;
 /// Note: The `store_from_*` methods are generally slightly quicker and smaller than the `fill_from_*` equivalents,
 /// but require you to already have the whole page stored in RAM somewhere
 ///
-pub struct PageBuffer<const N: Address> {
+pub struct PageBuffer {
     address: Address,
 }
 
@@ -39,21 +37,22 @@ pub struct BufferCell {
     offset: u8,
 }
 
-impl<const N: Address> PageBuffer<N> {
-    const OFFSET_MASK: Address = (N << 1) - 1 as Address;
+impl PageBuffer {
+    pub const LEN: usize = crate::SPM_PAGESIZE_WORDS;
+    const OFFSET_MASK: Address = ((Self::LEN << 1) - 1) as Address;
     const PAGE_MASK: Address = (!Self::OFFSET_MASK);
 
     /// Create a new PageBuffer with the given address.
-    /// 
+    ///
     /// The page address will be aligned downwards to the nearest starting page address
-    pub fn new(address: Address) -> PageBuffer<N> {
+    pub fn new(address: Address) -> PageBuffer {
         PageBuffer {
             address: address & Self::PAGE_MASK,
         }
     }
 
     /// Get the page address.
-    /// 
+    ///
     /// The page address will be aligned downwards to the nearest starting page address
     pub fn address(&self) -> Address {
         self.address & Self::PAGE_MASK
@@ -64,7 +63,7 @@ impl<const N: Address> PageBuffer<N> {
     /// # Example
     ///
     /// ```no_run
-    /// let data = [0xffff; crate::SPM_PAGESIZE_WORDS];
+    /// let data = [0xffff; PageBuffer::LEN];
     /// let mut buff = PageBuffer::new(address);
     /// buff.store_from_slice(&data);
     /// ```
@@ -79,12 +78,12 @@ impl<const N: Address> PageBuffer<N> {
     /// # Example
     ///
     /// ```no_run
-    /// let data = [0xff; crate::SPM_PAGESIZE_BYTES];
+    /// let data = [0xff; avr_boot::SPM_PAGESIZE_BYTES];
     /// let mut buff = PageBuffer::new(address);
     /// buff.store_from_bytes(&data);
     /// ```
     pub fn store_from_bytes(self, data: &[u16; crate::SPM_PAGESIZE_BYTES]) {
-        let data_words: &[u16; crate::SPM_PAGESIZE_WORDS] = unsafe { core::mem::transmute(data) };
+        let data_words: &[u16; Self::LEN] = unsafe { core::mem::transmute(data) };
         self.store_from_slice(data_words);
     }
 
@@ -138,7 +137,7 @@ impl<const N: Address> PageBuffer<N> {
     }
 }
 
-impl<const N: Address> Drop for PageBuffer<N> {
+impl Drop for PageBuffer {
     fn drop(&mut self) {
         // TODO: on some MCUs there is a buffer clear SPM command, run it here
         // clear_buffer(self.address);
@@ -157,7 +156,7 @@ impl<const N: Address> Drop for PageBuffer<N> {
 /// }
 /// buff.store();
 /// ```
-impl<const N: Address> Iterator for PageBuffer<N> {
+impl Iterator for PageBuffer {
     type Item = BufferCell;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -167,7 +166,7 @@ impl<const N: Address> Iterator for PageBuffer<N> {
         // sneaky bit-stuffing: becuase the buffer entries are always words
         // we have a spare bit in address, and can use this to avoid needing to add
         // an extra value to keep track of the iteration
-        if offset < N {
+        if (offset as usize) < Self::LEN {
             self.address = address + 1;
             Some(BufferCell {
                 offset: (offset as u8) << 1,
@@ -178,9 +177,9 @@ impl<const N: Address> Iterator for PageBuffer<N> {
     }
 }
 
-impl<const N: Address> ExactSizeIterator for PageBuffer<N> {
+impl ExactSizeIterator for PageBuffer {
     fn len(&self) -> usize {
-        (N - (self.address & Self::PAGE_MASK)) as usize
+        Self::LEN - (self.address & Self::PAGE_MASK) as usize
     }
 }
 

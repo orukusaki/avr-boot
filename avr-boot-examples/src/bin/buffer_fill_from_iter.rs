@@ -2,8 +2,8 @@
 #![no_main]
 
 use avr_boot::PageBuffer;
-use panic_halt as _;
 use avr_boot_examples::run_test;
+use panic_halt as _;
 
 #[avr_device::entry]
 fn main() -> ! {

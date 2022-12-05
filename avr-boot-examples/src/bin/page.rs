@@ -2,8 +2,8 @@
 #![no_main]
 
 use avr_boot::{spm, DataPage};
-use panic_halt as _;
 use avr_boot_examples::run_test;
+use panic_halt as _;
 
 #[avr_device::entry]
 fn main() -> ! {

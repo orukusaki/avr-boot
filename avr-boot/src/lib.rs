@@ -8,41 +8,41 @@
 //! It is hal independent, and optimised for code size. Written in pure Rust plus some artisanal, hand-crafted asm
 //!
 //! Regular and extended (>64k) addressing modes are supported.
-//! 
+//!
 //! ## Getting started
 //! Add the module to your Cargo.toml:
 //! ```toml
 //! [dependencies]
 //! avr-boot = "0.1.0"
 //! ```
-//! 
+//!
 //! Pick from the high level API:
 //! ```rust
 //! use avr_boot::{DataPage, PageBuffer};
-//! 
+//!
 //! let page_address: spm::Address = 0x1000;
 //! let data: DataPage = core::array::from_fn(|_| 0x1234);
 //! let buff = PageBuffer::new(page_address);
 //! buff.store_from_slice(&data);
 //! ```
-//! 
+//!
 //! Or the low level one:
 //! ```rust
 //! use avr_boot::{spm, SPM_PAGESIZE_WORDS};
-//! 
+//!
 //! let page_address = 0x1000;
 //! for w in 0..SPM_PAGESIZE_WORDS {
 //!     spm::fill_page(0x1000 + (w * 2) as spm::Address, 0x1234);
 //! }
 //! spm::erase_page(page_address);
 //! spm::busy_wait();
-//! 
+//!
 //! spm::write_page(page_address);
 //! spm::busy_wait();
-//! 
+//!
 //! spm::rww_enable();
 //! ```
-//! 
+//!
 #![no_std]
 #![feature(asm_experimental_arch)]
 #![feature(asm_const)]
@@ -65,7 +65,7 @@ const RWW_ENABLE: u8 = value_from_env!("AVR_BOOT_RWW_ENABLE": u8);
 /// An array of memory the same size as the page buffer
 pub type DataPage = [u16; SPM_PAGESIZE_WORDS];
 
-#[cfg(extended_addressing)]
+#[cfg(any(extended_addressing, doc))]
 pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 
 pub mod spm_extended;
@@ -81,5 +81,4 @@ pub use spm_normal as spm;
 
 pub mod buffer;
 
-///re-export of [buffer::PageBuffer], with the correct page size set for the current MCU
-pub type PageBuffer = buffer::PageBuffer<{ SPM_PAGESIZE_WORDS as spm::Address }>;
+pub type PageBuffer = buffer::PageBuffer;

@@ -34,7 +34,7 @@ pub fn run_test<F: FnOnce(spm::Address) -> ()>(f: F) {
     signal_pin.set_high();
 }
 
-#[cfg(feature="extended_addressing")]
+#[cfg(feature = "extended_addressing")]
 pub mod extended {
 
     #[cfg(feature = "hal-atmega")]

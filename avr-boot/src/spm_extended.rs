@@ -19,7 +19,7 @@ pub fn store_page(address: Address, data: &DataPage) {
 }
 
 /// Erase the page from program memory
-/// 
+///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn erase_page(address: Address) {
     rampz((address >> 16) as u8);
@@ -27,14 +27,14 @@ pub fn erase_page(address: Address) {
 }
 
 /// Write data to the page buffer
-/// 
+///
 /// Only the PCWORD part of the address actually matters, the size if which varies according to SPM_PAGESIZE_BYTES
 pub fn fill_page(address: Address, data: u16) {
     spm_normal::fill_page(address as u16, data);
 }
 
 /// Write the page from the buffer to the program memory
-/// 
+///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn write_page(address: Address) {
     rampz((address >> 16) as u8);
@@ -60,8 +60,8 @@ pub fn rww_enable() {
     spm_normal::rww_enable();
 }
 
-/// Wait for the current SPM operation to complete. 
-/// 
+/// Wait for the current SPM operation to complete.
+///
 /// On devices with a RWW section, the CPU is not halted during the SPM operation if the RWW section is being written to.
 /// Therefore it is important that we make sure the operation is complete before trying to do the next operation.
 pub fn busy_wait() {
