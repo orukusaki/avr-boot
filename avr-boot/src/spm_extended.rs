@@ -1,7 +1,13 @@
+//! Low level page buffer API for MCUs with >64k of storage
+//! use [crate::spm] to get the correct mode for your target MCU
+
 use crate::{spm_normal, DataPage};
 
 pub type Address = u32;
 
+/// Store a whole page into program memory by erasing the page, filling the buffer,
+/// and writing the buffer to the program memory.  
+/// `address` must be page aligned.
 pub fn store_page(address: Address, data: &DataPage) {
     fill_page_buffer(address, data);
 
@@ -12,20 +18,33 @@ pub fn store_page(address: Address, data: &DataPage) {
     rww_enable();
 }
 
+/// Erase the page from program memory
+/// 
+/// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn erase_page(address: Address) {
     rampz((address >> 16) as u8);
     spm_normal::erase_page(address as u16);
 }
 
+/// Write data to the page buffer
+/// 
+/// Only the PCWORD part of the address actually matters, the size if which varies according to SPM_PAGESIZE_BYTES
 pub fn fill_page(address: Address, data: u16) {
     spm_normal::fill_page(address as u16, data);
 }
 
+/// Write the page from the buffer to the program memory
+/// 
+/// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn write_page(address: Address) {
     rampz((address >> 16) as u8);
     spm_normal::write_page(address as u16);
 }
 
+/// Fill the whole buffer at once
+///
+/// If have the data in a RAM buffer already, this is slightly smaller
+/// and faster than using [`fill_page`] in a loop
 pub fn fill_page_buffer(address: Address, data: &DataPage) {
     rampz((address >> 16) as u8);
     spm_normal::fill_page_buffer(address as u16, data);
@@ -36,10 +55,15 @@ pub fn lock_bits_set(lock_bits: u8) {
     spm_normal::lock_bits_set(lock_bits);
 }
 
+/// Re-enable the RWW section after programming, to enable it to be read
 pub fn rww_enable() {
     spm_normal::rww_enable();
 }
 
+/// Wait for the current SPM operation to complete. 
+/// 
+/// On devices with a RWW section, the CPU is not halted during the SPM operation if the RWW section is being written to.
+/// Therefore it is important that we make sure the operation is complete before trying to do the next operation.
 pub fn busy_wait() {
     spm_normal::busy_wait()
 }

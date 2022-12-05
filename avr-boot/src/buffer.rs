@@ -1,4 +1,8 @@
-use crate::spm;
+//! High level page buffer API
+//! use the re-exported [crate::PageBuffer] to ensure your buffer is
+//! the correct size for your target MCU
+
+use crate::{spm, DataPage};
 use crate::spm::Address;
 
 /// Representation of the spm page buffer.
@@ -16,9 +20,9 @@ use crate::spm::Address;
 /// buff.store();
 /// ```
 /// A whole page is written in one go, so if you only want to change part of a page, you need to make sure you have
-/// loaded the rest of the page into the buffer.
+/// loaded the rest of the page into the buffer first.
 ///
-/// There is only one buffer in the system, therefore you should make sure only one of these structs
+/// There is only one physical buffer in the system, so you should make sure only one of these structs ever
 /// exists at any time. This rule is not enforced.
 ///
 /// The page address will be aligned downwards to the nearest starting page address
@@ -39,7 +43,8 @@ impl<const N: Address> PageBuffer<N> {
     const OFFSET_MASK: Address = (N << 1) - 1 as Address;
     const PAGE_MASK: Address = (!Self::OFFSET_MASK);
 
-    /// Create a new PageBuffer with the given address
+    /// Create a new PageBuffer with the given address.
+    /// 
     /// The page address will be aligned downwards to the nearest starting page address
     pub fn new(address: Address) -> PageBuffer<N> {
         PageBuffer {
@@ -47,7 +52,8 @@ impl<const N: Address> PageBuffer<N> {
         }
     }
 
-    /// Get the page address
+    /// Get the page address.
+    /// 
     /// The page address will be aligned downwards to the nearest starting page address
     pub fn address(&self) -> Address {
         self.address & Self::PAGE_MASK
@@ -62,7 +68,7 @@ impl<const N: Address> PageBuffer<N> {
     /// let mut buff = PageBuffer::new(address);
     /// buff.store_from_slice(&data);
     /// ```
-    pub fn store_from_slice(self, data: &[u16; crate::SPM_PAGESIZE_WORDS]) {
+    pub fn store_from_slice(self, data: &DataPage) {
         spm::store_page(self.address(), data);
         // No need to run destructor
         core::mem::forget(self);
@@ -77,9 +83,9 @@ impl<const N: Address> PageBuffer<N> {
     /// let mut buff = PageBuffer::new(address);
     /// buff.store_from_bytes(&data);
     /// ```
-    pub fn store_from_bytes(self, data: &[u8; crate::SPM_PAGESIZE_BYTES]) {
-        let aswords: &[u16; crate::SPM_PAGESIZE_WORDS] = unsafe { core::mem::transmute(data) };
-        self.store_from_slice(aswords);
+    pub fn store_from_bytes(self, data: &[u16; crate::SPM_PAGESIZE_BYTES]) {
+        let data_words: &[u16; crate::SPM_PAGESIZE_WORDS] = unsafe { core::mem::transmute(data) };
+        self.store_from_slice(data_words);
     }
 
     /// Fill the buffer by repeatedly calling the callback function
@@ -101,11 +107,10 @@ impl<const N: Address> PageBuffer<N> {
     }
 
     /// Fill the buffer by repeatedly polling an iterator.  
-    /// Panics if the iterator returns null.
     ///
     /// # Example
     ///
-    /// ```
+    /// ```no_run
     /// let data = [0x69];
     /// let i = data.iter().cycle();
     ///
