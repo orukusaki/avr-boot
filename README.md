@@ -42,7 +42,7 @@ use avr_boot::{spm, SPM_PAGESIZE_WORDS};
 
 let page_address = 0x1000;
 for w in 0..SPM_PAGESIZE_WORDS {
-    spm::fill_page(0x1000 + (w * 2) as spm::Address, 0x1234);
+    spm::fill_page(page_address + (w * 2) as spm::Address, 0x1234);
 }
 spm::erase_page(page_address);
 spm::busy_wait();

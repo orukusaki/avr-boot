@@ -130,13 +130,6 @@ impl PageBuffer {
 
         spm::write_page(page_address);
         spm::busy_wait();
-    }
-}
-
-impl Drop for PageBuffer {
-    fn drop(&mut self) {
-        // TODO: on some MCUs there is a buffer clear SPM command, run it here
-        // clear_buffer(self.address);
         spm::rww_enable();
     }
 }
