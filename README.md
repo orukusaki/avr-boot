@@ -1,4 +1,6 @@
 # Avr Boot
+[![Rust](https://github.com/orukusaki/avr-boot/actions/workflows/rust.yml/badge.svg)](https://github.com/orukusaki/avr-boot/actions/workflows/rust.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/orukusaki/avr-boot/master/LICENSE)
 
 This crate contains functions to write to the program memory of Avr MCUs, using the `spm` instruction.
 
@@ -14,7 +16,7 @@ On many devices the spm instruction will only work if the programming code is in
 On most MCUs the fuses will also need to be set correctly to allow self-programming. 
 Interrupts should always be disabled while self-programming.
 
-It supports regular and extended (>64k) addressing modes
+This crate supports regular and extended (>64k) addressing modes
 
 ## Getting started
 

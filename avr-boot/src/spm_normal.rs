@@ -1,4 +1,4 @@
-//! Low level page buffer API for MCUs with <64k of storage.
+//! Low level API for MCUs with <64k of storage.
 //! use [crate::spm] to get the correct mode for your target MCU
 
 pub use crate::*;
@@ -36,7 +36,7 @@ pub fn erase_page(address: Address) {
 
 /// Write data to the page buffer
 ///
-/// Only the PCWORD part of the address actually matters, the size if which varies according to SPM_PAGESIZE_BYTES
+/// Only the PCWORD part of the address actually matters, the size of which varies according to SPM_PAGESIZE_BYTES
 pub fn fill_page(address: Address, data: u16) {
     unsafe {
         asm!(

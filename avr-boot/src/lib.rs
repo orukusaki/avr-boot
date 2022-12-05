@@ -65,7 +65,7 @@ const RWW_ENABLE: u8 = value_from_env!("AVR_BOOT_RWW_ENABLE": u8);
 /// An array of memory the same size as the page buffer
 pub type DataPage = [u16; SPM_PAGESIZE_WORDS];
 
-#[cfg(any(extended_addressing, doc))]
+#[cfg(any(extended_addressing))]
 pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 
 pub mod spm_extended;

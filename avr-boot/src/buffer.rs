@@ -17,6 +17,7 @@ use crate::{spm, DataPage};
 /// }
 /// buff.store();
 /// ```
+/// 
 /// A whole page is written in one go, so if you only want to change part of a page, you need to make sure you have
 /// loaded the rest of the page into the buffer first.
 ///
@@ -69,8 +70,6 @@ impl PageBuffer {
     /// ```
     pub fn store_from_slice(self, data: &DataPage) {
         spm::store_page(self.address(), data);
-        // No need to run destructor
-        core::mem::forget(self);
     }
 
     /// Fill the buffer from a byte slice, and write it immediately
@@ -131,9 +130,6 @@ impl PageBuffer {
 
         spm::write_page(page_address);
         spm::busy_wait();
-
-        // No need to run destructor
-        core::mem::forget(self);
     }
 }
 
