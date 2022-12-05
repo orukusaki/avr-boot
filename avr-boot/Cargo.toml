@@ -7,7 +7,7 @@ license = "MIT"
 description = "Self Programming functions for AVR MCUs"
 readme = "../README.md"
 repository = "https://github.com/orukusaki/avr-boot"
-keywords = ["avr", "booloader", "arduino", "atmega", "attiny", "microcontroller", "simavr"]
+keywords = ["avr", "booloader", "atmega", "attiny", "microcontroller"]
 
 [dependencies]
 const_env--value = "0.1"
