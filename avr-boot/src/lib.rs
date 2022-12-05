@@ -1,11 +1,11 @@
 //! # Avr Boot
 //!
-//! This crate contains functions to write to the program memory of Avr MCUs, using the `spm` instruction.
+//! This crate contains functions to write to the program memory of AVR MCUs, using the `spm` instruction.
 //!
-//! It could be considered a reimagining of the macros in boot.h from avr-libc
+//! It could be considered a reimagining of the macros in boot.h from avr-libc, but in Rust, plus some artisanal, hand-crafted asm
 //! If you're looking to create a bootloader, this crate should be useful.
 //!
-//! It is hal independent, and optimised for code size. Written in pure Rust plus some artisanal, hand-crafted asm
+//! It is hal independent, and optimised for code size.
 //!
 //! Regular and extended (>64k) addressing modes are supported.
 //!
@@ -43,6 +43,8 @@
 //! spm::rww_enable();
 //! ```
 //!
+//! Check out the [examples module](https://github.com/orukusaki/avr-boot/tree/main/avr-boot-examples/src/bin) for more usage examples 
+
 #![no_std]
 #![feature(asm_experimental_arch)]
 #![feature(asm_const)]
