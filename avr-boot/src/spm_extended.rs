@@ -1,7 +1,7 @@
 //! Low level API for MCUs with >64k of storage.
 //! use [crate::spm] to get the correct mode for your target MCU
 
-use crate::{Address, spm_normal, DataPage};
+use crate::{spm_normal, Address, DataPage};
 
 // pub type Address = u32;
 
