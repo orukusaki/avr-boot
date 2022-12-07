@@ -18,26 +18,26 @@
 //!
 //! Pick from the high level API:
 //! ```rust
-//! use avr_boot::{DataPage, PageBuffer};
+//! use avr_boot::PageBuffer;
 //!
-//! let page_address: spm::Address = 0x1000;
-//! let data: DataPage = core::array::from_fn(|_| 0x1234);
-//! let buff = PageBuffer::new(page_address);
+//! let address: u16 = 0x1000;
+//! let data = [0xffff; PageBuffer::LEN];
+//! let buff = PageBuffer::new(address.into());
 //! buff.store_from_slice(&data);
 //! ```
 //!
 //! Or the low level one:
 //! ```rust
-//! use avr_boot::{spm, SPM_PAGESIZE_WORDS};
+//! use avr_boot::{spm, SPM_PAGESIZE_WORDS, Address};
 //!
-//! let page_address = 0x1000;
+//! let page_address: u16 = 0x1000;
 //! for w in 0..SPM_PAGESIZE_WORDS {
-//!     spm::fill_page(0x1000 + (w * 2) as spm::Address, 0x1234);
+//!     spm::fill_page((page_address + (w * 2) as u16).into(), 0x1234);
 //! }
-//! spm::erase_page(page_address);
+//! spm::erase_page(page_address.into());
 //! spm::busy_wait();
 //!
-//! spm::write_page(page_address);
+//! spm::write_page(page_address.into());
 //! spm::busy_wait();
 //!
 //! spm::rww_enable();
@@ -55,10 +55,15 @@ use const_env__value::value_from_env;
 pub const SPM_PAGESIZE_BYTES: usize = value_from_env!("AVR_BOOT_SPM_PAGESIZE": usize);
 pub const SPM_PAGESIZE_WORDS: usize = SPM_PAGESIZE_BYTES / 2;
 
+#[cfg(target_arch = "avr")]
 const SPMCSR: *mut u8 = value_from_env!("AVR_BOOT_SPMCSR": u8) as *mut u8;
+#[cfg(target_arch = "avr")]
 const PAGE_ERASE: u8 = value_from_env!("AVR_BOOT_PAGE_ERASE": u8);
+#[cfg(target_arch = "avr")]
 const PAGE_WRITE: u8 = value_from_env!("AVR_BOOT_PAGE_WRITE": u8);
+#[cfg(target_arch = "avr")]
 const PAGE_FILL: u8 = value_from_env!("AVR_BOOT_PAGE_FILL": u8);
+#[cfg(target_arch = "avr")]
 const LOCK_BITS_SET: u8 = value_from_env!("AVR_BOOT_LOCK_BITS_SET": u8);
 
 #[cfg(rww_enable)]
@@ -81,7 +86,7 @@ pub use spm_extended as spm;
 #[cfg(not(extended_addressing))]
 pub use spm_normal as spm;
 
-pub mod address;
+mod address;
 
 pub use address::Address24 as Address;
 

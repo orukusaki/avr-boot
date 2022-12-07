@@ -10,6 +10,8 @@ use crate::{spm, DataPage};
 ///
 /// # Example
 /// ```no_run
+/// use avr_boot::PageBuffer;
+///
 /// let address:u16 = 0x1000;
 /// let buff = PageBuffer::new(address.into());
 /// for w in buff.iter() {
@@ -45,8 +47,10 @@ impl PageBuffer {
     ///
     /// # Example
     /// ```rust
-    /// let buff = PageBuffer::new(0x101f);
-    /// assert_eq!(0x1000, buff.address().into());
+    /// use avr_boot::PageBuffer;
+    ///
+    /// let buff = PageBuffer::new(0x101fu16.into());
+    /// assert_eq!(0x1000u16, buff.address().into());
     /// ```
     /// The page address will be aligned downwards to the nearest starting page address
     pub fn new(address: Address) -> PageBuffer {
@@ -59,7 +63,9 @@ impl PageBuffer {
     ///
     /// # Example
     /// ```rust
-    /// let buff = PageBuffer::new(0x1000);
+    /// use avr_boot::{PageBuffer, Address};
+    ///
+    /// let buff = PageBuffer::new(0x1000u16.into());
     /// assert_eq!(Address::new(0x1000), buff.address());
     /// ```
     /// The page address will be aligned downwards to the nearest starting page address
@@ -72,8 +78,11 @@ impl PageBuffer {
     /// # Example
     ///
     /// ```no_run
+    /// use avr_boot::PageBuffer;
+    ///
+    /// let address: u16 = 0x1000;
     /// let data = [0xffff; PageBuffer::LEN];
-    /// let buff = PageBuffer::new(address);
+    /// let buff = PageBuffer::new(address.into());
     /// buff.store_from_slice(&data);
     /// ```
     pub fn store_from_slice(self, data: &DataPage) {
@@ -85,8 +94,11 @@ impl PageBuffer {
     /// # Example
     ///
     /// ```no_run
+    /// use avr_boot::PageBuffer;
+    ///
+    /// let address:u16 = 0x1000;
     /// let data = [0xff; avr_boot::SPM_PAGESIZE_BYTES];
-    /// let buff = PageBuffer::new(address);
+    /// let buff = PageBuffer::new(address.into());
     /// buff.store_from_bytes(&data);
     /// ```
     pub fn store_from_bytes(self, data: &[u8; crate::SPM_PAGESIZE_BYTES]) {
@@ -99,8 +111,11 @@ impl PageBuffer {
     /// # Example
     ///
     /// ```no_run
-    /// let buff = PageBuffer::new(address);
-    /// buff.fill_from_fn(|offset| offset);
+    /// use avr_boot::PageBuffer;
+    ///
+    /// let address:u16 = 0x1000;
+    /// let buff = PageBuffer::new(address.into());
+    /// buff.fill_from_fn(|offset| offset.into());
     /// buff.store();
     /// ```
     pub fn fill_from_fn<F>(&self, f: F)
@@ -117,13 +132,15 @@ impl PageBuffer {
     /// # Example
     ///
     /// ```no_run
-    /// let data = [0x69];
-    /// let i = data.iter().cycle();
-    /// let page_address = 0x1000;
+    /// use avr_boot::PageBuffer;
+    ///
+    /// let data = [0x69u16];
+    /// let i = data.into_iter().cycle();
+    /// let page_address:u16 = 0x1000;
     /// let buff = PageBuffer::new(page_address.into());
     /// buff.fill_from_iter(i);
     /// buff.store();
-    /// /// ```
+    /// ```
     pub fn fill_from_iter(&self, i: impl IntoIterator<Item = u16>) {
         for (word, value) in self.iter().zip(i.into_iter()) {
             word.set(value);
@@ -145,7 +162,10 @@ impl PageBuffer {
     /// # Example
     ///
     /// ```no_run
-    /// let buff = PageBuffer::new(address);
+    /// use avr_boot::PageBuffer;
+    ///
+    /// let address: u16 = 0x1000;
+    /// let buff = PageBuffer::new(address.into());
     /// for w in buff.iter() {
     ///     w.set(0x69);
     /// }

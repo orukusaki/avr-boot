@@ -28,26 +28,26 @@ avr-boot = "0.1.0"
 
 Pick from the high level API:
 ```rust
-use avr_boot::{DataPage, PageBuffer};
+use avr_boot::PageBuffer;
 
-let page_address: spm::Address = 0x1000;
-let data: DataPage = core::array::from_fn(|_| 0x1234);
-let buff = PageBuffer::new(page_address);
+let address: u16 = 0x1000;
+let data = [0xffff; PageBuffer::LEN];
+let buff = PageBuffer::new(address.into());
 buff.store_from_slice(&data);
 ```
 
 Or the low level one:
 ```rust
-use avr_boot::{spm, SPM_PAGESIZE_WORDS};
+use avr_boot::{spm, SPM_PAGESIZE_WORDS, Address};
 
-let page_address = 0x1000;
+let page_address: u16 = 0x1000;
 for w in 0..SPM_PAGESIZE_WORDS {
-    spm::fill_page(page_address + (w * 2) as spm::Address, 0x1234);
+    spm::fill_page((page_address + (w * 2) as u16).into(), 0x1234);
 }
-spm::erase_page(page_address);
+spm::erase_page(page_address.into());
 spm::busy_wait();
 
-spm::write_page(page_address);
+spm::write_page(page_address.into());
 spm::busy_wait();
 
 spm::rww_enable();

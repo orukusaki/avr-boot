@@ -2,8 +2,7 @@
 //! use [crate::spm] to get the correct mode for your target MCU
 
 use crate::{spm_normal, Address, DataPage};
-
-// pub type Address = u32;
+use cfg_if::cfg_if;
 
 /// Store a whole page into program memory by erasing the page, filling the buffer,
 /// and writing the buffer to the program memory.  
@@ -68,14 +67,13 @@ pub fn busy_wait() {
     spm_normal::busy_wait()
 }
 
-#[cfg(extended_addressing)]
+#[allow(unused_variables)]
 fn rampz(value: u8) {
-    unsafe {
-        core::ptr::write_volatile(crate::RAMPZ, value);
+    cfg_if! {
+        if #[cfg(all(target_arch = "avr", extended_addressing, not(doc)))] {
+            unsafe {
+                core::ptr::write_volatile(crate::RAMPZ, value);
+            }
+        }
     }
-}
-
-#[cfg(not(extended_addressing))]
-fn rampz(_value: u8) {
-    // Do nothing in normal mode - RAMPZ does not exist
 }

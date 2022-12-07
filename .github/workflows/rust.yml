@@ -19,7 +19,10 @@ jobs:
     - name: Build
       working-directory: avr-boot
       run: cargo build --verbose --release -Zbuild-std=core --target=../.cargo/targets/atmega328.json
-    - name: Run tests
+    - name: Run unit/doc tests
+      working-directory: avr-boot
+      run: cargo test
+    - name: Run integration tests
       working-directory: avr-boot-tests
       run: cargo test --verbose -j1
     - name: Generate docs

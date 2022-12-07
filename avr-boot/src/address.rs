@@ -1,6 +1,6 @@
 use core::convert::From;
 
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct Address24 {
     base: u16,
     ramp: u8,

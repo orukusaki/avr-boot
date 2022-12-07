@@ -11,6 +11,7 @@ keywords = ["avr", "booloader", "atmega", "attiny", "microcontroller"]
 
 [dependencies]
 const_env--value = "0.1"
+cfg-if = "1.0.0"
 
 [build-dependencies]
 avr-mcu = "0.3.5"
