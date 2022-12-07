@@ -65,3 +65,32 @@ impl From<Address24> for u16 {
         address.base
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_aligns_addess_to_page() {
+        let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
+        let address: Address24 = start_address.into();
+
+        assert_eq!(address.into_page_aligned(), Address24::new(crate::SPM_PAGESIZE_BYTES as u32 * 8));
+    }
+
+    #[test]
+    fn it_masks_pcword_part() {
+        let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
+        let address: Address24 = start_address.into();
+
+        assert_eq!(address.word(), 17);
+    }
+
+    #[test]
+    fn it_adds_offset_to_page_base() {
+        let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
+        let address: Address24 = start_address.into();
+
+        assert_eq!(address.with_offset(5), (crate::SPM_PAGESIZE_BYTES as u32 * 8 + 5).into());
+    }
+}

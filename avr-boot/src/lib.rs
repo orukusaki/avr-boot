@@ -90,6 +90,6 @@ mod address;
 
 pub use address::Address24 as Address;
 
-pub mod buffer;
+mod buffer;
 
-pub type PageBuffer = buffer::PageBuffer;
+pub use buffer::PageBuffer as PageBuffer;
