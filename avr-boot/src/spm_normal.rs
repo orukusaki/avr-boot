@@ -4,8 +4,7 @@
 pub use crate::*;
 use core::arch::asm;
 
-use crate::address::Address16 as Address;
-// pub type Address = u16;
+use crate::Address;
 
 /// Store a whole page into program memory by erasing the page, filling the buffer,
 /// and writing the buffer to the program memory.  

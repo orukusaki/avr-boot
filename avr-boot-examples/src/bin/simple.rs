@@ -9,7 +9,7 @@ use panic_halt as _;
 fn main() -> ! {
     run_test(|page_address: u16| {
         for w in 0..SPM_PAGESIZE_WORDS {
-            let address = Address::new(page_address + (w * 2) as u16);
+            let address:Address = (page_address + (w * 2) as u16).into();
             spm::fill_page(address, 0x69);
         }
         spm::erase_page(page_address.into());

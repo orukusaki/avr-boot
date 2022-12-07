@@ -83,10 +83,6 @@ pub use spm_normal as spm;
 
 pub mod address;
 
-#[cfg(not(extended_addressing))]
-pub use address::Address16 as Address;
-
-#[cfg(extended_addressing)]
 pub use address::Address24 as Address;
 
 pub mod buffer;
