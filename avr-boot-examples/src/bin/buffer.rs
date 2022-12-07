@@ -8,9 +8,9 @@ use panic_halt as _;
 #[avr_device::entry]
 fn main() -> ! {
     run_test(|address| {
-        let mut buff = PageBuffer::new(address);
+        let buff = PageBuffer::new(address.into());
 
-        for w in &mut buff {
+        for w in buff.iter() {
             w.set(0x69);
         }
 

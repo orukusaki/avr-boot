@@ -4,8 +4,7 @@
 pub use crate::*;
 use core::arch::asm;
 
-pub type Address = u16;
-
+use crate::address::Address16 as Address;
 // pub type Address = u16;
 
 /// Store a whole page into program memory by erasing the page, filling the buffer,
@@ -24,12 +23,13 @@ pub fn store_page(address: Address, data: &DataPage) {
 ///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn erase_page(address: Address) {
+    let z_address: u16 = address.into_page_aligned().into();
     unsafe {
         asm!(
             "rcall {spm}",
             spm = sym spm,
             in("r24") PAGE_ERASE,
-            in("Z") address,
+            in("Z") z_address,
         );
     }
 }
@@ -38,6 +38,7 @@ pub fn erase_page(address: Address) {
 ///
 /// Only the PCWORD part of the address actually matters, the size of which varies according to SPM_PAGESIZE_BYTES
 pub fn fill_page(address: Address, data: u16) {
+    let z_address: u16 = address.word();
     unsafe {
         asm!(
             "
@@ -48,7 +49,7 @@ pub fn fill_page(address: Address, data: u16) {
             data = in(reg_iw) data,
             spm = sym spm,
             in("r24") PAGE_FILL,
-            in("Z") address,
+            in("Z") z_address,
         )
     }
 }
@@ -57,12 +58,13 @@ pub fn fill_page(address: Address, data: u16) {
 ///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn write_page(address: Address) {
+    let z_address: u16 = address.into_page_aligned().into();
     unsafe {
         asm!(
             "rcall {spm}",
             spm = sym spm,
             in("r24") PAGE_WRITE,
-            in("Z") address,
+            in("Z") z_address,
         )
     }
 }
@@ -72,6 +74,7 @@ pub fn write_page(address: Address) {
 /// If have the data in a RAM buffer already, this is slightly smaller
 /// and faster than using [`fill_page`] in a loop
 pub fn fill_page_buffer(address: Address, data: &DataPage) {
+    let z_address: u16 = address.into_page_aligned().into();
     unsafe {
         asm!(
             "
@@ -90,7 +93,7 @@ pub fn fill_page_buffer(address: Address, data: &DataPage) {
             spm = sym spm,
             in("r24") PAGE_FILL,
             inout("X") data.as_ptr() => _,
-            inout("Z") address => _,
+            inout("Z") z_address => _,
         )
     }
 }

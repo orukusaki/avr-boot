@@ -43,7 +43,7 @@
 //! spm::rww_enable();
 //! ```
 //!
-//! Check out the [examples module](https://github.com/orukusaki/avr-boot/tree/main/avr-boot-examples/src/bin) for more usage examples 
+//! Check out the [examples module](https://github.com/orukusaki/avr-boot/tree/main/avr-boot-examples/src/bin) for more usage examples
 
 #![no_std]
 #![feature(asm_experimental_arch)]
@@ -80,6 +80,14 @@ pub use spm_extended as spm;
 /// Will link to either spm_normal or spm_extended depending on the target
 #[cfg(not(extended_addressing))]
 pub use spm_normal as spm;
+
+pub mod address;
+
+#[cfg(not(extended_addressing))]
+pub use address::Address16 as Address;
+
+#[cfg(extended_addressing)]
+pub use address::Address24 as Address;
 
 pub mod buffer;
 

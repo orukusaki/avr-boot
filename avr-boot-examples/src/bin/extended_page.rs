@@ -9,7 +9,7 @@ use panic_halt as _;
 fn main() -> ! {
     run_test(|address| {
         let data: DataPage = [0x69; SPM_PAGESIZE_WORDS];
-        spm::store_page(address, &data);
+        spm::store_page(address.into(), &data);
     });
     loop {}
 }

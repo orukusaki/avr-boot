@@ -1,9 +1,9 @@
 //! Low level API for MCUs with >64k of storage.
 //! use [crate::spm] to get the correct mode for your target MCU
 
-use crate::{spm_normal, DataPage};
+use crate::{address::Address24 as Address, spm_normal, DataPage};
 
-pub type Address = u32;
+// pub type Address = u32;
 
 /// Store a whole page into program memory by erasing the page, filling the buffer,
 /// and writing the buffer to the program memory.  
@@ -22,23 +22,23 @@ pub fn store_page(address: Address, data: &DataPage) {
 ///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn erase_page(address: Address) {
-    rampz((address >> 16) as u8);
-    spm_normal::erase_page(address as u16);
+    rampz(address.ramp());
+    spm_normal::erase_page(address.into_base());
 }
 
 /// Write data to the page buffer
 ///
 /// Only the PCWORD part of the address actually matters, the size of which varies according to SPM_PAGESIZE_BYTES
 pub fn fill_page(address: Address, data: u16) {
-    spm_normal::fill_page(address as u16, data);
+    spm_normal::fill_page(address.into_base(), data);
 }
 
 /// Write the page from the buffer to the program memory
 ///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 pub fn write_page(address: Address) {
-    rampz((address >> 16) as u8);
-    spm_normal::write_page(address as u16);
+    rampz(address.ramp());
+    spm_normal::write_page(address.into_base());
 }
 
 /// Fill the whole buffer at once
@@ -46,8 +46,8 @@ pub fn write_page(address: Address) {
 /// If have the data in a RAM buffer already, this is slightly smaller
 /// and faster than using [`fill_page`] in a loop
 pub fn fill_page_buffer(address: Address, data: &DataPage) {
-    rampz((address >> 16) as u8);
-    spm_normal::fill_page_buffer(address as u16, data);
+    rampz(address.ramp());
+    spm_normal::fill_page_buffer(address.into_base(), data);
 }
 
 pub fn lock_bits_set(lock_bits: u8) {

@@ -9,7 +9,7 @@ use panic_halt as _;
 fn main() -> ! {
     run_test(|address| {
         let data: DataPage = core::array::from_fn(|_| 0x69);
-        let buff = PageBuffer::new(address);
+        let buff = PageBuffer::new(address.into());
         buff.store_from_slice(&data);
     });
 

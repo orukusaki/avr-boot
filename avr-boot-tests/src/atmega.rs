@@ -15,7 +15,7 @@ use test_case::test_case;
 
 #[test_case("buffer_fill_from_fn",      "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_fn")]
 #[test_case("buffer_fill_from_iter",    "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_iter")]
-#[test_case("buffer_fill_from_slice",   "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_slice")]
+#[test_case("buffer_store_from_bytes",  "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_slice")]
 #[test_case("buffer_store_from_slice",  "atmega328",    "atmega328p";   "atmega328 buffer_store_from_slice")]
 #[test_case("buffer",                   "atmega328",    "atmega328p";   "atmega328 buffer")]
 #[test_case("page",                     "atmega328",    "atmega328p";   "atmega328 page")]
