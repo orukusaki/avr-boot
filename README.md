@@ -34,21 +34,22 @@ use avr_boot::PageBuffer;
 let address: u16 = 0x1000;
 let data = [0xffff; PageBuffer::LEN];
 let buff = PageBuffer::new(address);
-buff.store_from_slice(&data);
+buff.copy_from(&data);
+buff.store();
 ```
 
 Or the low level one:
 ```rust
 use avr_boot::{spm, SPM_PAGESIZE_WORDS, Address};
 
-let page_address: u16 = 0x1000;
+let address: u16 = 0x1000;
 for w in 0..SPM_PAGESIZE_WORDS {
-    spm::fill_page((page_address + (w * 2) as u16), 0x1234);
+    spm::fill_page((address + (w * 2) as u16), 0x1234);
 }
-spm::erase_page(page_address);
+spm::erase_page(address);
 spm::busy_wait();
 
-spm::write_page(page_address);
+spm::write_page(address);
 spm::busy_wait();
 
 spm::rww_enable();
