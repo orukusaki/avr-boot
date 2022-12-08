@@ -29,7 +29,7 @@ use core::iter;
 ///
 /// The page address will be aligned downwards to the nearest starting page address
 ///
-/// Note: The `store_from_*` methods are generally slightly quicker and smaller than the `fill_from_*` equivalents,
+/// Note: [`PageBuffer::store_from`] and [`PageBuffer::copy_from`] are generally slightly quicker and smaller than the `fill_from_*` equivalents,
 /// but require you to already have the whole page stored in RAM somewhere
 ///
 pub struct PageBuffer {
@@ -165,7 +165,7 @@ impl PageBuffer {
         spm::write_page(self.address);
     }
 
-    /// Iterate the buffer as writable [`BufferCell`]s
+    /// Iterate the buffer as writable word cells
     ///
     /// # Example
     ///
