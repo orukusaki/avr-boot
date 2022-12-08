@@ -2,7 +2,7 @@
 //!
 //! This crate contains functions to write to the program memory of AVR MCUs, using the `spm` instruction.
 //!
-//! It could be considered a reimagining of the macros in boot.h from avr-libc, but in Rust, plus some artisanal, hand-crafted asm
+//! It could be considered a reimagining of the macros in boot.h from avr-libc, but in Rust, plus some artisanal, hand-crafted asm.
 //! If you're looking to create a bootloader, this crate should be useful.
 //!
 //! It is hal independent, and optimised for code size.
@@ -72,7 +72,7 @@ const LOCK_BITS_SET: u8 = value_from_env!("AVR_BOOT_LOCK_BITS_SET": u8);
 #[cfg(rww_enable)]
 const RWW_ENABLE: u8 = value_from_env!("AVR_BOOT_RWW_ENABLE": u8);
 
-/// An array of memory the same size as the page buffer
+/// NewType, an array of memory the same size as the page buffer
 pub struct DataPage(pub [u16; SPM_PAGESIZE_WORDS]);
 
 impl<'a> From<&'a [u16; SPM_PAGESIZE_WORDS]> for &'a DataPage {
@@ -107,6 +107,7 @@ impl Deref for DataPage {
 }
 
 #[cfg(any(extended_addressing))]
+#[doc(hidden)]
 pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 
 pub mod spm;

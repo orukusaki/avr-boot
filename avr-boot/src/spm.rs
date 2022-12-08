@@ -1,5 +1,4 @@
-//! Low level API for MCUs with <64k of storage.
-//! use [crate::spm] to get the correct mode for your target MCU
+//! Low level API for calling bootloader functions
 
 use crate::Address;
 use crate::*;

@@ -1,5 +1,9 @@
 use core::convert::From;
 
+/// 16 or 24 bit program memory address
+///
+/// Used internally to provide correct page allignment and efficient storage.
+/// Use u16.into() or u32.into() to suit your target MCU's address space size
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct Address {
     base: u16,
@@ -10,7 +14,7 @@ impl Address {
     const PCWORD_MASK: u16 = (crate::SPM_PAGESIZE_BYTES - 1) as u16;
     const PCPAGE_MASK: u16 = !Self::PCWORD_MASK;
 
-    pub fn new(base: u32) -> Self {
+    fn new(base: u32) -> Self {
         Self {
             base: base as u16,
             ramp: (base >> 16) as u8,
@@ -44,6 +48,12 @@ impl Address {
 
 impl From<u16> for Address {
     fn from(i: u16) -> Self {
+        Self::new(i as u32)
+    }
+}
+
+impl From<u8> for Address {
+    fn from(i: u8) -> Self {
         Self::new(i as u32)
     }
 }

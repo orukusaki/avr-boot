@@ -1,7 +1,6 @@
 //! High level page buffer API
 
-use crate::Address;
-use crate::{spm, DataPage};
+use crate::{spm, Address, DataPage};
 use core::iter;
 
 /// Representation of the spm page buffer.
@@ -219,6 +218,6 @@ pub struct BufferCell {
 impl BufferCell {
     /// Set the value of the word in the spm buffer
     pub fn set(&self, w: u16) {
-        spm::fill_page(Address::new(self.offset.into()), w);
+        spm::fill_page(self.offset, w);
     }
 }
