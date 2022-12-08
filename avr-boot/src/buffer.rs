@@ -36,7 +36,8 @@ pub struct PageBuffer {
 }
 
 impl PageBuffer {
-    pub const LEN: usize = crate::SPM_PAGESIZE_WORDS;
+    /// The buffer length in words, the value will change depending on the MCU compilation target
+    pub const LENGTH: usize = crate::SPM_PAGESIZE_WORDS;
 
     /// Create a new PageBuffer with the given address.
     ///
@@ -61,7 +62,7 @@ impl PageBuffer {
     /// use avr_boot::{PageBuffer, Address};
     ///
     /// let buff = PageBuffer::new(0x1000u16);
-    /// assert_eq!(Address::new(0x1000), buff.address());
+    /// assert_eq!(Address::from(0x1000u16), buff.address());
     /// ```
     /// The page address will be aligned downwards to the nearest starting page address
     pub fn address(&self) -> Address {

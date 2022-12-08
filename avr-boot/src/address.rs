@@ -3,7 +3,10 @@ use core::convert::From;
 /// 16 or 24 bit program memory address
 ///
 /// Used internally to provide correct page allignment and efficient storage.
-/// Use u16.into() or u32.into() to suit your target MCU's address space size
+/// Use u16.into() or u32.into() to suit your target MCU's address space size.
+/// 
+/// Although this struct is always 3 bytes in size, on an MCU with <65kB of flash memory,
+/// the highest byte is optimised away completely, taking it's effective size down to only 2 bytes.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct Address {
     base: u16,
@@ -21,18 +24,22 @@ impl Address {
         }
     }
 
+    /// Mask off the PCWORD part of the address, leaving only PCPAGE.  
+    /// 
+    /// The resulting address is aligned to the start of the page. 
     pub fn into_page_aligned(self) -> Self {
         Self {
             base: self.base & Self::PCPAGE_MASK,
             ramp: self.ramp,
         }
     }
-
-    /// The word byte index: technically PCWORD << 1
+  
+    /// The word byte index within the page: technically PCWORD << 1
     pub fn word(&self) -> u16 {
         self.base & Self::PCWORD_MASK
     }
 
+    /// Create a new address by taking the first address of the page and adding the given offset
     pub fn with_offset(&self, offset: u8) -> Self {
         let aligned = self.into_page_aligned();
         Self {
@@ -41,6 +48,7 @@ impl Address {
         }
     }
 
+    /// The extended byte of the address, usually written to RAMPZ on MCUs with extended addressing
     pub fn ramp(&self) -> u8 {
         self.ramp
     }

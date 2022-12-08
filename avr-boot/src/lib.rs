@@ -21,7 +21,7 @@
 //! use avr_boot::PageBuffer;
 //!
 //! let address: u16 = 0x1000;
-//! let data = [0xffff; PageBuffer::LEN];
+//! let data = [0xffff; PageBuffer::LENGTH];
 //! let buff = PageBuffer::new(address);
 //! buff.copy_from(&data);
 //! buff.store();
