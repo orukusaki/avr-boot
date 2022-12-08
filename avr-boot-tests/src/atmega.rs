@@ -1,22 +1,12 @@
 use super::avr;
 use test_case::test_case;
 
-// #[test_case("simple", "atmega16", 64; "atmega16 simple")]
-// #[test_case("simple", "atmega64m1", 64; "atmega64m1 simple")]
-
-// #[test_case("simple", "atmega16m1", 64; "atmega16m1 simple")]
-// #[test_case("simple", "atmega32", 64; "atmega32 simple")]
-
-// #[test_case("simple", "atmega169p", 64; "atmega169p simple")] 'avr_make_mcu_by_name() failed: AVR `atmega169p` is not known'
-// #[test_case("simple", "atmega328pb", 64; "atmega328pb simple")] // can't build linking with `avr-gcc` failed: exit status: 1
-// #[test_case("simple", "atmega32u4", 64; "atmega32u4 simple")] // no uart0
-
-// #[test_case("simple", "atmega8", "atmega8", 64; "atmega8 simple")]        //      -- no hal support? in avr-device but not atmega-hal
-
 #[test_case("buffer_fill_from_fn",      "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_fn")]
 #[test_case("buffer_fill_from_iter",    "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_iter")]
-#[test_case("buffer_store_from_bytes",  "atmega328",    "atmega328p";   "atmega328 buffer_fill_from_slice")]
+#[test_case("buffer_store_from_bytes",  "atmega328",    "atmega328p";   "atmega328 buffer_store_from_bytes")]
 #[test_case("buffer_store_from_slice",  "atmega328",    "atmega328p";   "atmega328 buffer_store_from_slice")]
+#[test_case("buffer_copy_from_bytes",  "atmega328",    "atmega328p";   "atmega328 buffer_copy_from_bytes")]
+#[test_case("buffer_copy_from_slice",  "atmega328",    "atmega328p";   "atmega328 buffer_copy_from_slice")]
 #[test_case("buffer",                   "atmega328",    "atmega328p";   "atmega328 buffer")]
 #[test_case("page",                     "atmega328",    "atmega328p";   "atmega328 page")]
 #[test_case("simple",                   "atmega328",    "atmega328p";   "atmega328 simple")]

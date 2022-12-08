@@ -13,8 +13,8 @@ fn main() -> ! {
             .enumerate()
             .for_each(|(n, b)| *b = if n % 2 == 0 { 0x69 } else { 0x00 });
 
-        let buff = PageBuffer::new(address.into());
-        buff.store_from_bytes(&data);
+        let buff = PageBuffer::new(address);
+        buff.store_from(&data);
     });
 
     loop {}

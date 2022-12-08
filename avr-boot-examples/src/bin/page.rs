@@ -8,8 +8,8 @@ use panic_halt as _;
 #[avr_device::entry]
 fn main() -> ! {
     run_test(|address| {
-        let data: DataPage = core::array::from_fn(|_| 0x69);
-        spm::store_page(address.into(), &data);
+        let data = DataPage(core::array::from_fn(|_| 0x69));
+        spm::store_page(address, &data);
     });
 
     loop {}

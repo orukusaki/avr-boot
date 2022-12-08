@@ -2,6 +2,7 @@
 
 use crate::Address;
 use crate::{spm, DataPage};
+use core::iter;
 
 /// Representation of the spm page buffer.
 ///
@@ -13,7 +14,7 @@ use crate::{spm, DataPage};
 /// use avr_boot::PageBuffer;
 ///
 /// let address:u16 = 0x1000;
-/// let buff = PageBuffer::new(address.into());
+/// let buff = PageBuffer::new(address);
 /// for w in buff.iter() {
 ///     w.set(0xabcd);
 /// }
@@ -35,11 +36,6 @@ pub struct PageBuffer {
     address: Address,
 }
 
-/// A word cell in the page buffer
-pub struct BufferCell {
-    offset: u8,
-}
-
 impl PageBuffer {
     pub const LEN: usize = crate::SPM_PAGESIZE_WORDS;
 
@@ -49,13 +45,13 @@ impl PageBuffer {
     /// ```rust
     /// use avr_boot::PageBuffer;
     ///
-    /// let buff = PageBuffer::new(0x101fu16.into());
+    /// let buff = PageBuffer::new(0x101fu16);
     /// assert_eq!(0x1000u16, buff.address().into());
     /// ```
     /// The page address will be aligned downwards to the nearest starting page address
-    pub fn new(address: Address) -> PageBuffer {
+    pub fn new(address: impl Into<Address>) -> PageBuffer {
         PageBuffer {
-            address: address.into_page_aligned(),
+            address: address.into().into_page_aligned(),
         }
     }
 
@@ -65,7 +61,7 @@ impl PageBuffer {
     /// ```rust
     /// use avr_boot::{PageBuffer, Address};
     ///
-    /// let buff = PageBuffer::new(0x1000u16.into());
+    /// let buff = PageBuffer::new(0x1000u16);
     /// assert_eq!(Address::new(0x1000), buff.address());
     /// ```
     /// The page address will be aligned downwards to the nearest starting page address
@@ -73,7 +69,19 @@ impl PageBuffer {
         self.address
     }
 
-    /// Fill the buffer from a slice, and write it immediately
+    /// Fill the buffer from a slice
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use avr_boot::{DataPage, PageBuffer};
+    ///
+    /// let address: u16 = 0x1000;
+    /// let data = DataPage(core::array::from_fn(|_| 0x69));
+    /// let buff = PageBuffer::new(address);
+    /// buff.copy_from(&data);
+    /// buff.store();
+    /// ```
     ///
     /// # Example
     ///
@@ -81,29 +89,35 @@ impl PageBuffer {
     /// use avr_boot::PageBuffer;
     ///
     /// let address: u16 = 0x1000;
-    /// let data = [0xffff; PageBuffer::LEN];
-    /// let buff = PageBuffer::new(address.into());
-    /// buff.store_from_slice(&data);
+    /// let data = [0xff; avr_boot::SPM_PAGESIZE_BYTES];
+    /// let buff = PageBuffer::new(address);
+    /// buff.copy_from(&data);
+    /// buff.store();
     /// ```
-    pub fn store_from_slice(self, data: &DataPage) {
-        spm::store_page(self.address, data);
+    pub fn copy_from<'a>(&self, data: impl Into<&'a DataPage>) {
+        spm::copy_to_buffer(data);
     }
 
-    /// Fill the buffer from a byte slice, and write it immediately
+    /// Fill the buffer from a slice and store it immediately
     ///
     /// # Example
     ///
     /// ```no_run
-    /// use avr_boot::PageBuffer;
+    /// use avr_boot::{DataPage, PageBuffer};
     ///
-    /// let address:u16 = 0x1000;
-    /// let data = [0xff; avr_boot::SPM_PAGESIZE_BYTES];
-    /// let buff = PageBuffer::new(address.into());
-    /// buff.store_from_bytes(&data);
+    /// let address: u16 = 0x1000;
+    /// let data = DataPage(core::array::from_fn(|_| 0x69));
+    /// let buff = PageBuffer::new(address);
+    /// buff.copy_from(&data);
+    /// buff.store();
     /// ```
-    pub fn store_from_bytes(self, data: &[u8; crate::SPM_PAGESIZE_BYTES]) {
-        let data_words: &[u16; Self::LEN] = unsafe { core::mem::transmute(data) };
-        self.store_from_slice(data_words);
+    ///
+    pub fn store_from<'a>(self, data: impl Into<&'a DataPage>) {
+        spm::erase_page(self.address);
+        spm::copy_to_buffer(data);
+
+        spm::busy_wait();
+        spm::write_page(self.address);
     }
 
     /// Fill the buffer by repeatedly calling the callback function
@@ -114,17 +128,15 @@ impl PageBuffer {
     /// use avr_boot::PageBuffer;
     ///
     /// let address:u16 = 0x1000;
-    /// let buff = PageBuffer::new(address.into());
-    /// buff.fill_from_fn(|offset| offset.into());
+    /// let buff = PageBuffer::new(address);
+    /// buff.fill_from_fn(|| Some(0x1234));
     /// buff.store();
     /// ```
     pub fn fill_from_fn<F>(&self, f: F)
     where
-        F: Fn(u8) -> u16,
+        F: FnMut() -> Option<u16>,
     {
-        for word in self.iter() {
-            word.set(f(word.offset));
-        }
+        self.fill_from_iter(iter::from_fn(f));
     }
 
     /// Fill the buffer by repeatedly polling an iterator.  
@@ -133,12 +145,11 @@ impl PageBuffer {
     ///
     /// ```no_run
     /// use avr_boot::PageBuffer;
+    /// use core::iter;
     ///
-    /// let data = [0x69u16];
-    /// let i = data.into_iter().cycle();
     /// let page_address:u16 = 0x1000;
-    /// let buff = PageBuffer::new(page_address.into());
-    /// buff.fill_from_iter(i);
+    /// let buff = PageBuffer::new(page_address);
+    /// buff.fill_from_iter(iter::repeat(0x69));
     /// buff.store();
     /// ```
     pub fn fill_from_iter(&self, i: impl IntoIterator<Item = u16>) {
@@ -151,10 +162,7 @@ impl PageBuffer {
     pub fn store(self) {
         spm::erase_page(self.address);
         spm::busy_wait();
-
         spm::write_page(self.address);
-        spm::busy_wait();
-        spm::rww_enable();
     }
 
     /// Iterate the buffer as writable [`BufferCell`]s
@@ -165,7 +173,7 @@ impl PageBuffer {
     /// use avr_boot::PageBuffer;
     ///
     /// let address: u16 = 0x1000;
-    /// let buff = PageBuffer::new(address.into());
+    /// let buff = PageBuffer::new(address);
     /// for w in buff.iter() {
     ///     w.set(0x69);
     /// }
@@ -173,6 +181,15 @@ impl PageBuffer {
     /// ```
     pub fn iter(&self) -> impl Iterator<Item = BufferCell> {
         CellIter { offset: 0 }
+    }
+}
+
+impl Drop for PageBuffer {
+    // Wait for any current spm operation to complete and
+    // re-enable the rww section (if there is one)
+    fn drop(&mut self) {
+        spm::busy_wait();
+        spm::rww_enable();
     }
 }
 
@@ -195,8 +212,12 @@ impl Iterator for CellIter {
 }
 
 /// A single 16 bit word in the page buffer. Write only.
+pub struct BufferCell {
+    offset: u8,
+}
+
 impl BufferCell {
-    /// Set the value of the cell
+    /// Set the value of the word in the spm buffer
     pub fn set(&self, w: u16) {
         spm::fill_page(Address::new(self.offset.into()), w);
     }

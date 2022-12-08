@@ -1,6 +1,7 @@
 # Avr Boot
 [![Rust](https://github.com/orukusaki/avr-boot/actions/workflows/rust.yml/badge.svg)](https://github.com/orukusaki/avr-boot/actions/workflows/rust.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/orukusaki/avr-boot/master/LICENSE)
+![docs.rs](https://img.shields.io/docsrs/avr-boot)(https://docs.rs/avr-boot/latest/avr_boot/)
 
 This crate contains functions to write to the program memory of Avr MCUs, using the `spm` instruction.
 
@@ -32,7 +33,7 @@ use avr_boot::PageBuffer;
 
 let address: u16 = 0x1000;
 let data = [0xffff; PageBuffer::LEN];
-let buff = PageBuffer::new(address.into());
+let buff = PageBuffer::new(address);
 buff.store_from_slice(&data);
 ```
 
@@ -42,12 +43,12 @@ use avr_boot::{spm, SPM_PAGESIZE_WORDS, Address};
 
 let page_address: u16 = 0x1000;
 for w in 0..SPM_PAGESIZE_WORDS {
-    spm::fill_page((page_address + (w * 2) as u16).into(), 0x1234);
+    spm::fill_page((page_address + (w * 2) as u16), 0x1234);
 }
-spm::erase_page(page_address.into());
+spm::erase_page(page_address);
 spm::busy_wait();
 
-spm::write_page(page_address.into());
+spm::write_page(page_address);
 spm::busy_wait();
 
 spm::rww_enable();

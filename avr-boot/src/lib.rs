@@ -22,8 +22,9 @@
 //!
 //! let address: u16 = 0x1000;
 //! let data = [0xffff; PageBuffer::LEN];
-//! let buff = PageBuffer::new(address.into());
-//! buff.store_from_slice(&data);
+//! let buff = PageBuffer::new(address);
+//! buff.copy_from(&data);
+//! buff.store();
 //! ```
 //!
 //! Or the low level one:
@@ -32,12 +33,12 @@
 //!
 //! let page_address: u16 = 0x1000;
 //! for w in 0..SPM_PAGESIZE_WORDS {
-//!     spm::fill_page((page_address + (w * 2) as u16).into(), 0x1234);
+//!     spm::fill_page((page_address + (w * 2) as u16), 0x1234);
 //! }
-//! spm::erase_page(page_address.into());
+//! spm::erase_page(page_address);
 //! spm::busy_wait();
 //!
-//! spm::write_page(page_address.into());
+//! spm::write_page(page_address);
 //! spm::busy_wait();
 //!
 //! spm::rww_enable();
@@ -49,6 +50,8 @@
 #![feature(asm_experimental_arch)]
 #![feature(asm_const)]
 #![feature(asm_sym)]
+
+use core::ops::Deref;
 
 use const_env__value::value_from_env;
 
@@ -70,26 +73,48 @@ const LOCK_BITS_SET: u8 = value_from_env!("AVR_BOOT_LOCK_BITS_SET": u8);
 const RWW_ENABLE: u8 = value_from_env!("AVR_BOOT_RWW_ENABLE": u8);
 
 /// An array of memory the same size as the page buffer
-pub type DataPage = [u16; SPM_PAGESIZE_WORDS];
+pub struct DataPage(pub [u16; SPM_PAGESIZE_WORDS]);
+
+impl<'a> From<&'a [u16; SPM_PAGESIZE_WORDS]> for &'a DataPage {
+    fn from(data: &'a [u16; SPM_PAGESIZE_WORDS]) -> &'a DataPage {
+        unsafe { core::mem::transmute(data) }
+    }
+}
+
+impl<'a> From<&'a [u8; SPM_PAGESIZE_BYTES]> for &'a DataPage {
+    fn from(data: &'a [u8; SPM_PAGESIZE_BYTES]) -> &'a DataPage {
+        unsafe { core::mem::transmute(data) }
+    }
+}
+
+impl From<[u16; SPM_PAGESIZE_WORDS]> for DataPage {
+    fn from(data: [u16; SPM_PAGESIZE_WORDS]) -> DataPage {
+        unsafe { core::mem::transmute(data) }
+    }
+}
+
+impl From<[u8; SPM_PAGESIZE_BYTES]> for DataPage {
+    fn from(data: [u8; SPM_PAGESIZE_BYTES]) -> DataPage {
+        unsafe { core::mem::transmute(data) }
+    }
+}
+
+impl Deref for DataPage {
+    type Target = [u16; SPM_PAGESIZE_WORDS];
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 #[cfg(any(extended_addressing))]
 pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 
-pub mod spm_extended;
-pub mod spm_normal;
-
-/// Will link to either spm_normal or spm_extended depending on the target
-#[cfg(extended_addressing)]
-pub use spm_extended as spm;
-
-/// Will link to either spm_normal or spm_extended depending on the target
-#[cfg(not(extended_addressing))]
-pub use spm_normal as spm;
+pub mod spm;
 
 mod address;
 
-pub use address::Address24 as Address;
+pub use address::Address;
 
 mod buffer;
 
-pub use buffer::PageBuffer as PageBuffer;
+pub use buffer::PageBuffer;

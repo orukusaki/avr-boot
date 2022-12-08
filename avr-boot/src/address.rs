@@ -1,12 +1,12 @@
 use core::convert::From;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct Address24 {
+pub struct Address {
     base: u16,
     ramp: u8,
 }
 
-impl Address24 {
+impl Address {
     const PCWORD_MASK: u16 = (crate::SPM_PAGESIZE_BYTES - 1) as u16;
     const PCPAGE_MASK: u16 = !Self::PCWORD_MASK;
 
@@ -42,26 +42,26 @@ impl Address24 {
     }
 }
 
-impl From<u16> for Address24 {
+impl From<u16> for Address {
     fn from(i: u16) -> Self {
         Self::new(i as u32)
     }
 }
 
-impl From<u32> for Address24 {
+impl From<u32> for Address {
     fn from(i: u32) -> Self {
         Self::new(i)
     }
 }
 
-impl From<Address24> for u32 {
-    fn from(address: Address24) -> u32 {
+impl From<Address> for u32 {
+    fn from(address: Address) -> u32 {
         address.base as u32 + ((address.ramp as u32) << 16)
     }
 }
 
-impl From<Address24> for u16 {
-    fn from(address: Address24) -> u16 {
+impl From<Address> for u16 {
+    fn from(address: Address) -> u16 {
         address.base
     }
 }
@@ -73,15 +73,18 @@ mod tests {
     #[test]
     fn it_aligns_addess_to_page() {
         let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
-        let address: Address24 = start_address.into();
+        let address: Address = start_address.into();
 
-        assert_eq!(address.into_page_aligned(), Address24::new(crate::SPM_PAGESIZE_BYTES as u32 * 8));
+        assert_eq!(
+            address.into_page_aligned(),
+            Address::new(crate::SPM_PAGESIZE_BYTES as u32 * 8)
+        );
     }
 
     #[test]
     fn it_masks_pcword_part() {
         let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
-        let address: Address24 = start_address.into();
+        let address: Address = start_address.into();
 
         assert_eq!(address.word(), 17);
     }
@@ -89,8 +92,11 @@ mod tests {
     #[test]
     fn it_adds_offset_to_page_base() {
         let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
-        let address: Address24 = start_address.into();
+        let address: Address = start_address.into();
 
-        assert_eq!(address.with_offset(5), (crate::SPM_PAGESIZE_BYTES as u32 * 8 + 5).into());
+        assert_eq!(
+            address.with_offset(5),
+            (crate::SPM_PAGESIZE_BYTES as u32 * 8 + 5).into()
+        );
     }
 }

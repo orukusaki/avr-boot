@@ -11,11 +11,19 @@ use core::arch::asm;
 /// Store a whole page into program memory by erasing the page, filling the buffer,
 /// and writing the buffer to the program memory.  
 /// `address` must be page aligned.
-pub fn store_page(address: Address, data: &DataPage) {
-    erase_page(address);
+pub fn store_page<'a>(address: impl Into<Address>, data: impl Into<&'a DataPage>) {
+    let page_address: Address = address.into();
+
+    erase_page(page_address);
+    copy_to_buffer(data);
+
+    // wait for erase_page to finish - on mcus with a RWW section,
+    // we can fill the buffer while the page is erasing
     busy_wait();
-    fill_page_buffer(address, data);
-    write_page(address);
+    write_page(page_address);
+
+    // wait for write_page to finish - on mcus with a RWW section,
+    // we can fill the buffer while the page is erasing
     busy_wait();
     rww_enable();
 }
@@ -24,8 +32,11 @@ pub fn store_page(address: Address, data: &DataPage) {
 ///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
-pub fn erase_page(address: Address) {
-    let z_address: u16 = address.into_page_aligned().into();
+pub fn erase_page(address: impl Into<Address>) {
+    let page_address: Address = address.into();
+    let z_address: u16 = page_address.into_page_aligned().into();
+
+    rampz(page_address.ramp());
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
@@ -37,15 +48,17 @@ pub fn erase_page(address: Address) {
                 );
             }
         }
-    } 
+    }
 }
 
 /// Write data to the page buffer
 ///
 /// Only the PCWORD part of the address actually matters, the size of which varies according to SPM_PAGESIZE_BYTES
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
-pub fn fill_page(address: Address, data: u16) {
-    let z_address: u16 = address.word();
+pub fn fill_page(address: impl Into<Address>, data: u16) {
+    let page_address: Address = address.into();
+    let z_address: u16 = page_address.into();
+
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
@@ -69,8 +82,11 @@ pub fn fill_page(address: Address, data: u16) {
 ///
 /// The PCPAGE part of the address is used to address the page, the PCWORD part must be zero
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
-pub fn write_page(address: Address) {
-    let z_address: u16 = address.into_page_aligned().into();
+pub fn write_page(address: impl Into<Address>) {
+    let page_address: Address = address.into();
+    let z_address: u16 = page_address.into_page_aligned().into();
+
+    rampz(page_address.ramp());
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
@@ -90,8 +106,8 @@ pub fn write_page(address: Address) {
 /// If have the data in a RAM buffer already, this is slightly smaller
 /// and faster than using [`fill_page`] in a loop
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
-pub fn fill_page_buffer(address: Address, data: &DataPage) {
-    let z_address: u16 = address.into_page_aligned().into();
+pub fn copy_to_buffer<'a>(data: impl Into<&'a DataPage>) {
+    rampz(0);
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
@@ -111,8 +127,8 @@ pub fn fill_page_buffer(address: Address, data: &DataPage) {
                     words = inout(reg) SPM_PAGESIZE_WORDS as u8 => _,
                     spm = sym spm,
                     in("r24") PAGE_FILL,
-                    inout("X") data.as_ptr() => _,
-                    inout("Z") z_address => _,
+                    inout("X") data.into().as_ptr() => _,
+                    inout("Z") 0u16 => _,
                 )
             }
         }
@@ -121,6 +137,7 @@ pub fn fill_page_buffer(address: Address, data: &DataPage) {
 
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
 pub fn lock_bits_set(lock_bits: u8) {
+    rampz(0);
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             let value = !lock_bits;
@@ -163,12 +180,26 @@ pub fn busy_wait() {
 }
 
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
-pub(crate) extern "C" fn spm(spmcsr_val: u8) {
+extern "C" fn spm(spmcsr_val: u8) {
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
                 core::ptr::write_volatile(SPMCSR, spmcsr_val);
                 asm!("spm")
+            }
+        }
+    }
+}
+
+#[cfg_attr(
+    not(all(target_arch = "avr", extended_addressing)),
+    allow(unused_variables)
+)]
+fn rampz(value: u8) {
+    cfg_if! {
+        if #[cfg(all(target_arch = "avr", extended_addressing, not(doc)))] {
+            unsafe {
+                core::ptr::write_volatile(crate::RAMPZ, value);
             }
         }
     }
