@@ -29,7 +29,7 @@ use core::iter;
 /// The page address will be aligned downwards to the nearest starting page address
 ///
 /// Note: [`PageBuffer::store_from`] and [`PageBuffer::copy_from`] are generally slightly quicker and smaller than the `fill_from_*` equivalents,
-/// but require you to already have the whole page stored in RAM somewhere
+/// if you to already have the whole page stored in RAM
 ///
 pub struct PageBuffer {
     address: Address,
@@ -115,8 +115,6 @@ impl PageBuffer {
     pub fn store_from<'a>(self, data: impl Into<&'a DataPage>) {
         spm::erase_page(self.address);
         spm::copy_to_buffer(data);
-
-        spm::busy_wait();
         spm::write_page(self.address);
     }
 
@@ -161,7 +159,6 @@ impl PageBuffer {
     /// Erase the page from program memory, then write the contents of the buffer to it
     pub fn store(self) {
         spm::erase_page(self.address);
-        spm::busy_wait();
         spm::write_page(self.address);
     }
 
@@ -188,7 +185,6 @@ impl Drop for PageBuffer {
     // Wait for any current spm operation to complete and
     // re-enable the rww section (if there is one)
     fn drop(&mut self) {
-        spm::busy_wait();
         spm::rww_enable();
     }
 }

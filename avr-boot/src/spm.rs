@@ -15,15 +15,7 @@ pub fn store_page<'a>(address: impl Into<Address>, data: impl Into<&'a DataPage>
 
     erase_page(page_address);
     copy_to_buffer(data);
-
-    // wait for erase_page to finish - on mcus with a RWW section,
-    // we can fill the buffer while the page is erasing
-    busy_wait();
     write_page(page_address);
-
-    // wait for write_page to finish - on mcus with a RWW section,
-    // we can fill the buffer while the page is erasing
-    busy_wait();
     rww_enable();
 }
 
@@ -35,6 +27,7 @@ pub fn erase_page(address: impl Into<Address>) {
     let page_address: Address = address.into();
     let z_address: u16 = page_address.into_page_aligned().into();
 
+    busy_wait();
     rampz(page_address.ramp());
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
@@ -58,6 +51,7 @@ pub fn fill_page(address: impl Into<Address>, data: u16) {
     let page_address: Address = address.into();
     let z_address: u16 = page_address.into();
 
+    busy_wait();
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
@@ -85,6 +79,7 @@ pub fn write_page(address: impl Into<Address>) {
     let page_address: Address = address.into();
     let z_address: u16 = page_address.into_page_aligned().into();
 
+    busy_wait();
     rampz(page_address.ramp());
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
@@ -102,10 +97,9 @@ pub fn write_page(address: impl Into<Address>) {
 
 /// Fill the whole buffer at once
 ///
-/// If have the data in a RAM buffer already, this is slightly smaller
-/// and faster than using [`fill_page`] in a loop
 #[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
 pub fn copy_to_buffer<'a>(data: impl Into<&'a DataPage>) {
+    busy_wait();
     rampz(0);
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {

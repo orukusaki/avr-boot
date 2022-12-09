@@ -4,7 +4,7 @@ use core::convert::From;
 ///
 /// Used internally to provide correct page allignment and efficient storage.
 /// Use u16.into() or u32.into() to suit your target MCU's address space size.
-/// 
+///
 /// Although this struct is always 3 bytes in size, on an MCU with <65kB of flash memory,
 /// the highest byte is optimised away completely, taking it's effective size down to only 2 bytes.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -25,15 +25,15 @@ impl Address {
     }
 
     /// Mask off the PCWORD part of the address, leaving only PCPAGE.  
-    /// 
-    /// The resulting address is aligned to the start of the page. 
+    ///
+    /// The resulting address is aligned to the start of the page.
     pub fn into_page_aligned(self) -> Self {
         Self {
             base: self.base & Self::PCPAGE_MASK,
             ramp: self.ramp,
         }
     }
-  
+
     /// The word byte index within the page: technically PCWORD << 1
     pub fn word(&self) -> u16 {
         self.base & Self::PCWORD_MASK
