@@ -13,11 +13,7 @@ fn main() -> ! {
             spm::fill_page(address, 0x69);
         }
         spm::erase_page(page_address);
-        spm::busy_wait();
-
         spm::write_page(page_address);
-        spm::busy_wait();
-
         spm::rww_enable();
     });
 

@@ -36,11 +36,7 @@
 //!     spm::fill_page((page_address + (w * 2) as u16), 0x1234);
 //! }
 //! spm::erase_page(page_address);
-//! spm::busy_wait();
-//!
 //! spm::write_page(page_address);
-//! spm::busy_wait();
-//!
 //! spm::rww_enable();
 //! ```
 //!

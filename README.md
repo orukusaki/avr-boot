@@ -47,11 +47,7 @@ for w in 0..SPM_PAGESIZE_WORDS {
     spm::fill_page((address + (w * 2) as u16), 0x1234);
 }
 spm::erase_page(address);
-spm::busy_wait();
-
 spm::write_page(address);
-spm::busy_wait();
-
 spm::rww_enable();
 ```
 
