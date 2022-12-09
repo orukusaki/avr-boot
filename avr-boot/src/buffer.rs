@@ -28,9 +28,6 @@ use core::iter;
 ///
 /// The page address will be aligned downwards to the nearest starting page address
 ///
-/// Note: [`PageBuffer::store_from`] and [`PageBuffer::copy_from`] are generally slightly quicker and smaller than the `fill_from_*` equivalents,
-/// if you to already have the whole page stored in RAM
-///
 pub struct PageBuffer {
     address: Address,
 }

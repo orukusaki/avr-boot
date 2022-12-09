@@ -47,13 +47,24 @@
 #![feature(asm_const)]
 #![feature(asm_sym)]
 
+mod address;
+mod buffer;
+
 use core::ops::Deref;
-
 use const_env__value::value_from_env;
+pub mod spm;
+pub use address::Address;
+pub use buffer::PageBuffer;
 
+/// Total size of the SPM page buffer, for the current MCU target
 pub const SPM_PAGESIZE_BYTES: usize = value_from_env!("AVR_BOOT_SPM_PAGESIZE": usize);
+
+/// Total length in 16 but words of the SPM page buffer, for the current MCU target
 pub const SPM_PAGESIZE_WORDS: usize = SPM_PAGESIZE_BYTES / 2;
 
+#[cfg(any(extended_addressing))]
+#[doc(hidden)]
+pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 #[cfg(target_arch = "avr")]
 const SPMCSR: *mut u8 = value_from_env!("AVR_BOOT_SPMCSR": u8) as *mut u8;
 #[cfg(target_arch = "avr")]
@@ -64,7 +75,6 @@ const PAGE_WRITE: u8 = value_from_env!("AVR_BOOT_PAGE_WRITE": u8);
 const PAGE_FILL: u8 = value_from_env!("AVR_BOOT_PAGE_FILL": u8);
 #[cfg(target_arch = "avr")]
 const LOCK_BITS_SET: u8 = value_from_env!("AVR_BOOT_LOCK_BITS_SET": u8);
-
 #[cfg(rww_enable)]
 const RWW_ENABLE: u8 = value_from_env!("AVR_BOOT_RWW_ENABLE": u8);
 
@@ -101,17 +111,3 @@ impl Deref for DataPage {
         &self.0
     }
 }
-
-#[cfg(any(extended_addressing))]
-#[doc(hidden)]
-pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
-
-pub mod spm;
-
-mod address;
-
-pub use address::Address;
-
-mod buffer;
-
-pub use buffer::PageBuffer;

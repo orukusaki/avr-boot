@@ -39,15 +39,6 @@ impl Address {
         self.base & Self::PCWORD_MASK
     }
 
-    /// Create a new address by taking the first address of the page and adding the given offset
-    pub fn with_offset(&self, offset: u8) -> Self {
-        let aligned = self.into_page_aligned();
-        Self {
-            base: aligned.base | (offset as u16),
-            ramp: self.ramp,
-        }
-    }
-
     /// The extended byte of the address, usually written to RAMPZ on MCUs with extended addressing
     pub fn ramp(&self) -> u8 {
         self.ramp
@@ -105,16 +96,5 @@ mod tests {
         let address: Address = start_address.into();
 
         assert_eq!(address.word(), 17);
-    }
-
-    #[test]
-    fn it_adds_offset_to_page_base() {
-        let start_address = crate::SPM_PAGESIZE_BYTES as u32 * 8 + 17;
-        let address: Address = start_address.into();
-
-        assert_eq!(
-            address.with_offset(5),
-            (crate::SPM_PAGESIZE_BYTES as u32 * 8 + 5).into()
-        );
     }
 }
