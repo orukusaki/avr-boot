@@ -1,7 +1,7 @@
 # Avr Boot
 [![Rust](https://github.com/orukusaki/avr-boot/actions/workflows/rust.yml/badge.svg)](https://github.com/orukusaki/avr-boot/actions/workflows/rust.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/orukusaki/avr-boot/master/LICENSE)
-![docs.rs](https://img.shields.io/docsrs/avr-boot)(https://docs.rs/avr-boot/latest/avr_boot/)
+[![docs.rs](https://img.shields.io/docsrs/avr-boot)](https://docs.rs/avr-boot/latest/avr_boot/)
 
 This crate contains functions to write to the program memory of Avr MCUs, using the `spm` instruction.
 
