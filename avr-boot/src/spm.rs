@@ -153,6 +153,7 @@ pub fn lock_bits_set(lock_bits: u8) {
 /// Re-enable the RWW section after programming, to enable it to be read
 #[cfg(rww_enable)]
 pub fn rww_enable() {
+    busy_wait();
     spm(RWW_ENABLE);
 }
 
