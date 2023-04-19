@@ -78,3 +78,5 @@ At the moment there is no support for chips that use the newer 'NVM' controller:
 And some MCUs don't support self-programming at all:
 * attiny10/12/15, attiny828
 
+## Contributing
+PRs welcome on [github](https://github.com/orukusaki/avr-boot)
