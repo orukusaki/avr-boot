@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-avr-tester = "0.1.0"
+avr-tester = "0.2.0"
 test-case = "2.2.2"

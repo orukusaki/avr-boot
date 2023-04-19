@@ -46,12 +46,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "avr-tester"
-version = "0.1.0"
+name = "avr-simulator"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b464606d6ee8b45b3fc523bdf8b6ebb97a66c23f35291a3dc0e11f6bd1e8e883"
+checksum = "5952bd859e7f87e1187dbe38bc9d7bd0855c3cc5c129de78d35729e6ebf96d49"
 dependencies = [
+ "libc",
  "simavr-ffi",
+]
+
+[[package]]
+name = "avr-tester"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2a7d09d61583a2030a62d15998d031fd9cdf7c5e4258cf01238ed8a438a207c"
+dependencies = [
+ "avr-simulator",
 ]
 
 [[package]]
