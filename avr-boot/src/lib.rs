@@ -45,7 +45,6 @@
 #![no_std]
 #![feature(asm_experimental_arch)]
 #![feature(asm_const)]
-#![feature(asm_sym)]
 
 mod address;
 mod buffer;
@@ -77,6 +76,7 @@ const PAGE_FILL: u8 = value_from_env!("AVR_BOOT_PAGE_FILL": u8);
 const LOCK_BITS_SET: u8 = value_from_env!("AVR_BOOT_LOCK_BITS_SET": u8);
 #[cfg(rww_enable)]
 const RWW_ENABLE: u8 = value_from_env!("AVR_BOOT_RWW_ENABLE": u8);
+
 
 /// NewType, an array of memory the same size as the page buffer
 pub struct DataPage(pub [u16; SPM_PAGESIZE_WORDS]);
