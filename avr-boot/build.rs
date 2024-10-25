@@ -11,6 +11,8 @@ struct McuInfo {
 
 fn main() {
     println!("cargo:rustc-link-arg=-lc");
+    println!("cargo::rustc-check-cfg=cfg(rww_enable)");
+    println!("cargo::rustc-check-cfg=cfg(extended_addressing)");
 
     let info = get_mcu_info();
 

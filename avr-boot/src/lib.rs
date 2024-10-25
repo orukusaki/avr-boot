@@ -44,8 +44,6 @@
 
 #![no_std]
 #![feature(asm_experimental_arch)]
-#![feature(asm_const)]
-#![feature(asm_sym)]
 
 mod address;
 mod buffer;
@@ -67,6 +65,8 @@ pub const SPM_PAGESIZE_WORDS: usize = SPM_PAGESIZE_BYTES / 2;
 pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 #[cfg(target_arch = "avr")]
 const SPMCSR: *mut u8 = value_from_env!("AVR_BOOT_SPMCSR": u8) as *mut u8;
+#[cfg(target_arch = "avr")]
+const SPMCSR_ADDR: u16 = value_from_env!("AVR_BOOT_SPMCSR": u8) as u16;
 #[cfg(target_arch = "avr")]
 const PAGE_ERASE: u8 = value_from_env!("AVR_BOOT_PAGE_ERASE": u8);
 #[cfg(target_arch = "avr")]
