@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build
       working-directory: avr-boot
-      run: cargo build --verbose --release -Zbuild-std=core --target=../.cargo/targets/atmega328.json
+      run: RUSTFLAGS='-Ctarget-cpu=atmega328p' cargo build --verbose --release -Zbuild-std=core --target=../.cargo/targets/atmega328.json
     - name: Run unit/doc tests
       working-directory: avr-boot
       run: cargo test
