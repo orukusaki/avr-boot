@@ -9,6 +9,7 @@ pub fn avr(test: &str, target: &str, hal: &str) -> AvrTester {
     let module_dir = Path::new("..").join("avr-boot-examples");
 
     Command::new("cargo")
+    .env("RUSTFLAGS", format!("-Ctarget-cpu={}", target))
         .arg("build")
         .arg("--release")
         .arg(format!("--target=../.cargo/targets/{}.json", target))
