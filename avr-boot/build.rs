@@ -22,7 +22,7 @@ fn main() {
     println!("cargo:rustc-env=AVR_BOOT_PAGE_FILL={}", info.page_fill);
 
     if let Some(rww_enable) = info.rww_enable {
-        println!("cargo:rustc-env=AVR_BOOT_RWW_ENABLE={}", rww_enable);
+        println!("cargo:rustc-env=AVR_BOOT_RWW_ENABLE={rww_enable}");
         println!("cargo:rustc-cfg=rww_enable");
     }
 
@@ -33,7 +33,7 @@ fn main() {
     println!("cargo:rustc-env=AVR_BOOT_SPM_PAGESIZE={}", info.page_size);
     if let Some(rampz) = info.rampz {
         println!("cargo:rustc-cfg=extended_addressing");
-        println!("cargo:rustc-env=AVR_RAMPZ={}", rampz);
+        println!("cargo:rustc-env=AVR_RAMPZ={rampz}");
     }
 }
 

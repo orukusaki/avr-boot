@@ -60,7 +60,7 @@ pub const SPM_PAGESIZE_BYTES: usize = value_from_env!("AVR_BOOT_SPM_PAGESIZE": u
 /// Total length in 16 byte words of the SPM page buffer, for the current MCU target
 pub const SPM_PAGESIZE_WORDS: usize = SPM_PAGESIZE_BYTES / 2;
 
-#[cfg(any(extended_addressing))]
+#[cfg(extended_addressing)]
 #[doc(hidden)]
 pub const RAMPZ: *mut u8 = value_from_env!("AVR_RAMPZ": u8) as *mut u8;
 #[cfg(target_arch = "avr")]
