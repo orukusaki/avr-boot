@@ -1,6 +1,6 @@
 [package]
 name = "avr-boot"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 authors = ["Peter Smith <peter@orukusaki.co.uk>"]
 license = "MIT"
