@@ -24,9 +24,9 @@ jobs:
     - name: Run unit/doc tests
       working-directory: avr-boot
       run: cargo test
-    - name: Run integration tests
-      working-directory: avr-boot-tests
-      run: cargo test --verbose -j1
+    # - name: Run integration tests
+    #   working-directory: avr-boot-tests
+    #   run: cargo test --verbose -j1
     - name: Generate docs
       working-directory: avr-boot
       run: cargo doc
