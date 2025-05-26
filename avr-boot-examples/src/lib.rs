@@ -1,7 +1,5 @@
 #![no_std]
 #![feature(asm_experimental_arch)]
-#![feature(asm_const)]
-#![feature(asm_sym)]
 
 #[cfg(feature = "hal-atmega")]
 use atmega_hal as hal;

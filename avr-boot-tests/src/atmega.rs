@@ -37,7 +37,7 @@ use test_case::test_case;
 #[test_case("extended_simple",          "atmega2561",   "atmega2560";   "atmega2561 simple")]
 fn run_test(test: &str, target: &str, hal: &str) {
     let mut avr = avr(test, target, hal);
-    avr.run_for_ms(10);
 
+    avr.run_for_ms(10);
     avr.pins().pb0().assert_high();
 }

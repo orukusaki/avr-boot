@@ -9,11 +9,12 @@ pub fn avr(test: &str, target: &str, hal: &str) -> AvrTester {
     let module_dir = Path::new("..").join("avr-boot-examples");
 
     Command::new("cargo")
+    .env("RUSTFLAGS", format!("-Ctarget-cpu={target}"))
         .arg("build")
         .arg("--release")
-        .arg(format!("--target=../.cargo/targets/{}.json", target))
-        .arg(format!("--bin={}", test))
-        .arg(format!("--features={}", hal))
+        .arg(format!("--target=../.cargo/targets/{target}.json"))
+        .arg(format!("--bin={test}"))
+        .arg(format!("--features={hal}"))
         .current_dir(&module_dir)
         .status()
         .expect("Couldn't build firmware")
@@ -24,7 +25,7 @@ pub fn avr(test: &str, target: &str, hal: &str) -> AvrTester {
         .join("target")
         .join(target)
         .join("release")
-        .join(format!("{}.elf", test));
+        .join(format!("{test}.elf"));
 
     eprintln!("Starting test");
 

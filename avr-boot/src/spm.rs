@@ -33,10 +33,13 @@ pub fn erase_page(address: impl Into<Address>) {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
                 asm!(
-                    "rcall {spm}",
-                    spm = sym spm,
+                    "
+                    out {SPMCSR} r24
+                    spm
+                    ",
                     in("r24") PAGE_ERASE,
                     in("Z") z_address,
+                    SPMCSR = const SPMCSR_ADDR - 0x20,
                 );
             }
         }
@@ -58,13 +61,14 @@ pub fn fill_page(address: impl Into<Address>, data: u16) {
                 asm!(
                     "
                     movw r0 {data}
-                    rcall {spm}
+                    out {SPMCSR} r24
+                    spm
                     eor	r1, r1
                     ",
                     data = in(reg_iw) data,
-                    spm = sym spm,
                     in("r24") PAGE_FILL,
                     in("Z") z_address,
+                    SPMCSR = const SPMCSR_ADDR - 0x20,
                 )
             }
         }
@@ -85,10 +89,13 @@ pub fn write_page(address: impl Into<Address>) {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
             unsafe {
                 asm!(
-                    "rcall {spm}",
-                    spm = sym spm,
+                    "
+                    out {SPMCSR} r24
+                    spm
+                    ",
                     in("r24") PAGE_WRITE,
                     in("Z") z_address,
+                    SPMCSR = const SPMCSR_ADDR - 0x20,
                 )
             }
         }
@@ -109,7 +116,8 @@ pub fn copy_to_buffer<'a>(data: impl Into<&'a DataPage>) {
                     1:                       
                         ld      r0,         X+  // Load r0r1 pair with data from X pointer
                         ld      r1,         X+
-                        rcall   {spm}           // call spm(PAGE_FILL) (r24 is always 1st byte argument)
+                        out {SPMCSR} r24
+                        spm                     // call spm(PAGE_FILL) (r24 is always 1st byte argument)
                         adiw    Z,          2   // increment Z
                         subi    {words},    1   // decrement counter
                         brne    1b              // loop until counter reaches 0
@@ -118,10 +126,10 @@ pub fn copy_to_buffer<'a>(data: impl Into<&'a DataPage>) {
                     ",
 
                     words = inout(reg) SPM_PAGESIZE_WORDS as u8 => _,
-                    spm = sym spm,
                     in("r24") PAGE_FILL,
                     inout("X") data.into().as_ptr() => _,
                     inout("Z") 0u16 => _,
+                    SPMCSR = const SPMCSR_ADDR - 0x20,
                 )
             }
         }
@@ -138,12 +146,13 @@ pub fn lock_bits_set(lock_bits: u8) {
                 asm!(
                     "
                     mov r0 {value}
-                    rcall {spm}
+                    out {SPMCSR} r24
+                    spm
                     ",
-                    spm = sym spm,
                     value = in(reg) value,
                     in("r24") LOCK_BITS_SET,
                     in("Z") 0x0001u16,
+                    SPMCSR = const SPMCSR_ADDR - 0x20,
                 )
             }
         }
@@ -154,7 +163,20 @@ pub fn lock_bits_set(lock_bits: u8) {
 #[cfg(rww_enable)]
 pub fn rww_enable() {
     busy_wait();
-    spm(RWW_ENABLE);
+    cfg_if! {
+        if #[cfg(all(target_arch = "avr", not(doc)))] {
+            unsafe {
+                asm!(
+                    "
+                    out {SPMCSR} r24
+                    spm
+                    ",
+                    in("r24") RWW_ENABLE,
+                    SPMCSR = const SPMCSR_ADDR - 0x20,
+                );
+            }
+        }
+    }
 }
 
 /// Empty function for devices without a RWW section
@@ -169,18 +191,6 @@ pub fn busy_wait() {
     cfg_if! {
         if #[cfg(all(target_arch = "avr", not(doc)))] {
            while unsafe { core::ptr::read_volatile(SPMCSR) } & PAGE_FILL != 0 {}
-        }
-    }
-}
-
-#[cfg_attr(not(target_arch = "avr"), allow(unused_variables))]
-extern "C" fn spm(spmcsr_val: u8) {
-    cfg_if! {
-        if #[cfg(all(target_arch = "avr", not(doc)))] {
-            unsafe {
-                core::ptr::write_volatile(SPMCSR, spmcsr_val);
-                asm!("spm")
-            }
         }
     }
 }
