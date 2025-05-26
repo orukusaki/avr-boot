@@ -1,7 +1,7 @@
 [package]
 name = "avr-boot"
-version = "0.2.4"
-edition = "2021"
+version = "0.3.0"
+edition = "2024"
 authors = ["Peter Smith <peter@orukusaki.co.uk>"]
 license = "MIT"
 description = "Self Programming functions for AVR MCUs"

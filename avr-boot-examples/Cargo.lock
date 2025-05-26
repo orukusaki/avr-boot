@@ -22,7 +22,7 @@ dependencies = [
 
 [[package]]
 name = "avr-boot"
-version = "0.2.4"
+version = "0.3.0"
 dependencies = [
  "avr-mcu",
  "cfg-if",
