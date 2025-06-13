@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt install -y build-essential make gcc-avr avr-libc libelf-dev clang pkg-config
+        sudo apt install -y gcc-avr avr-libc libelf-dev pkg-config
     - uses: actions/checkout@v4
     - name: Build
       working-directory: avr-boot
@@ -27,9 +27,9 @@ jobs:
     - name: Run unit/doc tests
       working-directory: avr-boot
       run: cargo test
-    # - name: Run integration tests
-    #   working-directory: avr-boot-tests
-    #   run: cargo test --verbose -j1
+    - name: Run integration tests
+      working-directory: avr-boot-tests
+      run: cargo test --release -j1
     - name: Generate docs
       working-directory: avr-boot
       run: cargo doc  --no-deps
