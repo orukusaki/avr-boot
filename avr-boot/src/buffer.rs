@@ -105,8 +105,7 @@ impl PageBuffer {
     /// let address: u16 = 0x1000;
     /// let data = DataPage(core::array::from_fn(|_| 0x69));
     /// let buff = PageBuffer::new(address);
-    /// buff.copy_from(&data);
-    /// buff.store();
+    /// buff.store_from(&data);
     /// ```
     ///
     pub fn store_from<'a>(self, data: impl Into<&'a DataPage>) {

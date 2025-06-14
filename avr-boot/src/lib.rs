@@ -52,7 +52,7 @@ impl<'a> From<&'a [u8; SPM_PAGESIZE_BYTES]> for &'a DataPage {
 
 impl From<[u16; SPM_PAGESIZE_WORDS]> for DataPage {
     fn from(data: [u16; SPM_PAGESIZE_WORDS]) -> DataPage {
-        unsafe { core::mem::transmute(data) }
+        DataPage(data)
     }
 }
 
