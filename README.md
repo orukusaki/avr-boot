@@ -22,9 +22,8 @@ This crate supports regular and extended (>64k) addressing modes
 ## Getting started
 
 Add the module to your Cargo.toml:
-```toml
-[dependencies]
-avr-boot = "0.3.0"
+```bash
+cargo add avr-boot
 ```
 
 Pick from the high level API:
